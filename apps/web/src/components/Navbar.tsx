@@ -1,5 +1,6 @@
 import React from 'react';
 import { Shield, Activity, Database, CheckCircle2 } from 'lucide-react';
+import GradientText from './GradientText';
 
 interface NavbarProps {
   currentRoute: string;
@@ -30,9 +31,15 @@ export const Navbar: React.FC<NavbarProps> = ({ currentRoute, blockHeight, druni
   };
 
   return (
-    <header className="h-16 border-b border-[#1a1d27] bg-[#0c0d12]/80 backdrop-blur-md px-8 flex items-center justify-between sticky top-0 z-20">
+    <header className="h-16 border-b border-[#1a1d27] bg-[#0c0d12]/85 backdrop-blur-md px-8 flex items-center justify-between sticky top-0 z-20">
       <div className="flex items-center gap-3">
-        <h1 className="text-sm font-semibold text-white tracking-tight">{getRouteTitle()}</h1>
+        <GradientText
+          colors={["#ffffff", "#cbd5e1", "#60a5fa", "#ffffff"]}
+          animationSpeed={5}
+          className="text-sm font-semibold tracking-tight text-white"
+        >
+          {getRouteTitle()}
+        </GradientText>
         <span className="text-[#374151]">/</span>
         <span className="text-xs font-mono text-[#6b7280]">payments-channel</span>
       </div>

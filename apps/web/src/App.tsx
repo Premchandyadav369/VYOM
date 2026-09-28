@@ -1,6 +1,17 @@
 import React, { useState, useEffect } from 'react';
+import {
+  LayoutDashboard,
+  ShieldAlert,
+  Network,
+  Blocks,
+  Cpu,
+  Globe2,
+  FlaskConical
+} from 'lucide-react';
 import { Sidebar } from './components/Sidebar';
 import { Navbar } from './components/Navbar';
+import SoftAurora from './components/SoftAurora';
+import Dock from './components/Dock';
 import { CommandCenter } from './pages/CommandCenter';
 import { PaymentMonitor } from './pages/PaymentMonitor';
 import { PaymentInspector } from './pages/PaymentInspector';
@@ -46,6 +57,44 @@ export const App: React.FC = () => {
     setCurrentRoute(route);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  const dockNavItems = [
+    {
+      icon: <LayoutDashboard className="w-4 h-4 text-[#60a5fa]" />,
+      label: "Command Center",
+      onClick: () => navigate("/")
+    },
+    {
+      icon: <ShieldAlert className="w-4 h-4 text-[#f59e0b]" />,
+      label: "Payment Monitor",
+      onClick: () => navigate("/payments")
+    },
+    {
+      icon: <Network className="w-4 h-4 text-[#a855f7]" />,
+      label: "Trust Graph",
+      onClick: () => navigate("/graph")
+    },
+    {
+      icon: <Blocks className="w-4 h-4 text-[#38bdf8]" />,
+      label: "Drunix Explorer",
+      onClick: () => navigate("/drunix")
+    },
+    {
+      icon: <Cpu className="w-4 h-4 text-[#10b981]" />,
+      label: "Payment Twin (Demo)",
+      onClick: () => navigate("/simulation")
+    },
+    {
+      icon: <Globe2 className="w-4 h-4 text-[#06b6d4]" />,
+      label: "Cross-Border Rail",
+      onClick: () => navigate("/remittance")
+    },
+    {
+      icon: <FlaskConical className="w-4 h-4 text-[#ec4899]" />,
+      label: "Research Lab",
+      onClick: () => navigate("/research")
+    }
+  ];
 
   const renderCurrentPage = () => {
     if (currentRoute === '/') {
@@ -95,13 +144,47 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="flex bg-[#08090d] text-[#e6edf3] min-h-screen">
+    <div className="relative flex bg-[#08090d] text-[#e6edf3] min-h-screen overflow-x-hidden">
+      {/* Ambient WebGL Soft Aurora Background */}
+      <div className="fixed inset-0 pointer-events-none z-0 opacity-40 overflow-hidden">
+        <SoftAurora
+          speed={0.35}
+          scale={1.8}
+          brightness={0.45}
+          color1="#1e3a8a"
+          color2="#2563eb"
+          noiseFrequency={2.2}
+          noiseAmplitude={0.85}
+          bandHeight={0.55}
+          bandSpread={1.2}
+          octaveDecay={0.12}
+          enableMouseInteraction={true}
+          mouseInfluence={0.2}
+        />
+      </div>
+
+      {/* Main Sidebar */}
       <Sidebar currentRoute={currentRoute} navigate={navigate} />
-      <div className="flex-1 ml-64 flex flex-col min-w-0">
+
+      {/* Workspace Area */}
+      <div className="flex-1 ml-64 flex flex-col min-w-0 relative z-10">
         <Navbar currentRoute={currentRoute} blockHeight={blockHeight} drunixMode={drunixMode} />
-        <main className="flex-1 p-8 max-w-7xl w-full mx-auto">
+        <main className="flex-1 p-8 max-w-7xl w-full mx-auto pb-28">
           {renderCurrentPage()}
         </main>
+      </div>
+
+      {/* Floating Quick Action Dock */}
+      <div className="fixed bottom-3 left-64 right-0 flex justify-center pointer-events-none z-40">
+        <div className="pointer-events-auto">
+          <Dock
+            items={dockNavItems}
+            panelHeight={52}
+            baseItemSize={38}
+            magnification={52}
+            distance={110}
+          />
+        </div>
       </div>
     </div>
   );

@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { api } from '../services/api';
 import { PaymentItem } from '../types';
+import GradientText from '../components/GradientText';
 
 interface CommandCenterProps {
   navigate: (route: string) => void;
@@ -59,7 +60,14 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({ navigate }) => {
       {/* Top Header Banner */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-bold tracking-tight text-white">Consortium Operations Dashboard</h2>
+          <h2 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+            <span>Consortium Operations Dashboard</span>
+            <span className="text-xs px-2 py-0.5 rounded bg-[#1e2433] border border-[#2b354f]">
+              <GradientText colors={["#60a5fa", "#38bdf8", "#93c5fd", "#60a5fa"]} animationSpeed={4}>
+                IGPS Active
+              </GradientText>
+            </span>
+          </h2>
           <p className="text-xs text-[#9ca3af] mt-0.5">
             Real-time intent-governed payment telemetry and Drunix multi-organization state finality.
           </p>
@@ -126,9 +134,13 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({ navigate }) => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Cpu className="w-4 h-4 text-[#3b82f6]" />
-            <h3 className="text-xs font-semibold text-white uppercase tracking-wider font-mono">
+            <GradientText
+              colors={["#ffffff", "#93c5fd", "#60a5fa", "#ffffff"]}
+              animationSpeed={6}
+              className="text-xs font-semibold uppercase tracking-wider font-mono text-white"
+            >
               Live Intent-Governed Payment State (IGPS) Pipeline
-            </h3>
+            </GradientText>
           </div>
           <span className="text-[11px] text-[#6b7280] font-mono">Drunix State Machine</span>
         </div>
