@@ -145,21 +145,21 @@ export const App: React.FC = () => {
 
   return (
     <div className="relative flex bg-[#08090d] text-[#e6edf3] min-h-screen overflow-x-hidden">
-      {/* Ambient WebGL Soft Aurora Background */}
-      <div className="fixed inset-0 pointer-events-none z-0 opacity-40 overflow-hidden">
+      {/* Ambient WebGL Soft Aurora Background (Subtle Deep Glow) */}
+      <div className="fixed inset-0 pointer-events-none z-0 opacity-20 overflow-hidden">
         <SoftAurora
-          speed={0.35}
-          scale={1.8}
-          brightness={0.45}
-          color1="#1e3a8a"
-          color2="#2563eb"
-          noiseFrequency={2.2}
-          noiseAmplitude={0.85}
-          bandHeight={0.55}
-          bandSpread={1.2}
-          octaveDecay={0.12}
+          speed={0.22}
+          scale={2.0}
+          brightness={0.35}
+          color1="#0f172a"
+          color2="#1e3a8a"
+          noiseFrequency={1.8}
+          noiseAmplitude={0.7}
+          bandHeight={0.65}
+          bandSpread={1.4}
+          octaveDecay={0.1}
           enableMouseInteraction={true}
-          mouseInfluence={0.2}
+          mouseInfluence={0.12}
         />
       </div>
 

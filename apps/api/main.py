@@ -14,6 +14,7 @@ from typing import Dict, Any, List, Optional
 from fastapi import FastAPI, HTTPException, Depends, Query, Header, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 # Ensure root is in python path
@@ -254,6 +255,44 @@ def create_payment(
     return response_data
 
 
+class BatchImportRequest(BaseModel):
+    payments: List[PaymentCreateRequest]
+
+
+@app.post("/payments/batch-import", tags=["Payments"])
+def batch_import_payments(req: BatchImportRequest, db: Session = Depends(get_db)):
+    """Batches through imported statement records, evaluates intent & risk, and commits to Drunix."""
+    results = []
+    allowed_cnt = 0
+    verify_cnt = 0
+    hold_cnt = 0
+    for p_req in req.payments:
+        try:
+            res = create_payment(p_req, db=db)
+            results.append(res)
+            decision = res.get("decision", "ALLOW")
+            if decision == "ALLOW":
+                allowed_cnt += 1
+            elif decision == "VERIFY":
+                verify_cnt += 1
+            else:
+                hold_cnt += 1
+        except Exception as e:
+            continue
+
+    total_vol = sum(p.get("amount", 0.0) for p in results)
+    return {
+        "imported_count": len(results),
+        "total_volume_inr": round(total_vol, 2),
+        "summary": {
+            "allowed": allowed_cnt,
+            "verified": verify_cnt,
+            "held": hold_cnt
+        },
+        "payments": results
+    }
+
+
 @app.get("/payments", tags=["Payments"])
 def list_payments(limit: int = 25, db: Session = Depends(get_db)):
     """Returns a list of all payments ordered by most recent."""
@@ -393,6 +432,89 @@ def get_recipient_profile(recipient_id: str, sender_id: str = "USR_00001", amoun
     """Returns recipient relationship telemetry, degree centrality, and mule cluster proximity."""
     feats = graph_engine.evaluate_recipient_trust(sender_id, recipient_id, amount)
     return feats.dict()
+
+
+class GraphNodeInjectRequest(BaseModel):
+    source_id: str
+    target_id: str
+    amount: float = 5000.0
+    is_mule: bool = False
+    label: Optional[str] = None
+
+
+@app.post("/graph/nodes", tags=["Graph"])
+def inject_graph_node(req: GraphNodeInjectRequest):
+    """Dynamically creates or updates nodes and edges in the live trust graph."""
+    return graph_engine.add_custom_node_or_edge(
+        source_id=req.source_id,
+        target_id=req.target_id,
+        amount=req.amount,
+        is_mule=req.is_mule,
+        label=req.label
+    )
+
+
+ACTIVE_POLICY_RULES = [
+    {
+        "id": "RULE-01",
+        "name": "Authority & Law Enforcement Coercion Intercept",
+        "description": "Trigger HOLD if intent narrative contains legal/police threat keywords (police, customs, cbi, arrest, narcotics) with an unfamiliar beneficiary.",
+        "severity": "CRITICAL",
+        "action": "HOLD",
+        "enabled": True,
+        "matches_count": 4
+    },
+    {
+        "id": "RULE-02",
+        "name": "Rapid Fan-Out Mule Account Quarantine",
+        "description": "Intercept payment if recipient VPA has > 8 incoming transfers from unique senders within 60 minutes.",
+        "severity": "HIGH",
+        "action": "HOLD",
+        "enabled": True,
+        "matches_count": 2
+    },
+    {
+        "id": "RULE-03",
+        "name": "Active Call-Coercion Delay & Step-Up Auth",
+        "description": "Enforce biometric secondary confirmation if sender is engaged in an active voice call with an unregistered contact.",
+        "severity": "HIGH",
+        "action": "VERIFY",
+        "enabled": True,
+        "matches_count": 3
+    },
+    {
+        "id": "RULE-04",
+        "name": "New Recipient Velocity Cap",
+        "description": "Limit first-time transfer to a newly added VPA to ₹10,000 for the first 24 hours.",
+        "severity": "MEDIUM",
+        "action": "VERIFY",
+        "enabled": True,
+        "matches_count": 5
+    },
+    {
+        "id": "RULE-05",
+        "name": "Remote Screen Sharing Immediate Lockdown",
+        "description": "Block transaction immediately if AnyDesk, TeamViewer, or screen mirroring is active during payment PIN entry.",
+        "severity": "CRITICAL",
+        "action": "HOLD",
+        "enabled": True,
+        "matches_count": 1
+    }
+]
+
+
+@app.get("/policy/rules", tags=["Policy Engine"])
+def get_policy_rules():
+    return ACTIVE_POLICY_RULES
+
+
+@app.post("/policy/rules/{rule_id}/toggle", tags=["Policy Engine"])
+def toggle_policy_rule(rule_id: str):
+    for r in ACTIVE_POLICY_RULES:
+        if r["id"] == rule_id:
+            r["enabled"] = not r["enabled"]
+            return {"rule_id": rule_id, "enabled": r["enabled"]}
+    raise HTTPException(status_code=404, detail="Rule not found")
 
 
 # ------------------------------------------------------------------------------
@@ -629,20 +751,28 @@ def get_analytics_overview(db: Session = Depends(get_db)):
     verify_count = db.query(DBPayment).filter(DBPayment.decision == "VERIFY").count()
     hold_count = db.query(DBPayment).filter(DBPayment.decision == "HOLD").count()
 
+    total_volume = db.query(func.sum(DBPayment.amount)).scalar() or 0.0
+    held_volume = db.query(func.sum(DBPayment.amount)).filter(DBPayment.decision == "HOLD").scalar() or 0.0
+    verified_volume = db.query(func.sum(DBPayment.amount)).filter(DBPayment.decision == "VERIFY").scalar() or 0.0
+
     total_blocks = len(drunix_adapter.blocks)
     total_txs = len(drunix_adapter.transactions)
 
+    sfe_score = round(min(5.0, max(1.0, 3.2 + (hold_count / max(1, total_payments)) * 3.5)), 2) if total_payments > 0 else 4.8
+
     return {
         "total_payments": total_payments,
-        "protected_volume_inr": 18450000.0,
+        "protected_volume_inr": round(float(total_volume), 2),
+        "held_volume_inr": round(float(held_volume), 2),
+        "verified_volume_inr": round(float(verified_volume), 2),
         "interventions": {
             "allowed": allowed_count,
             "verified": verify_count,
             "held": hold_count
         },
-        "intent_mismatches_prevented": max(3, verify_count),
-        "scams_neutralized": max(2, hold_count),
-        "sfe_efficiency_score": 4.8,
+        "intent_mismatches_prevented": verify_count,
+        "scams_neutralized": hold_count,
+        "sfe_efficiency_score": sfe_score,
         "drunix_blocks": total_blocks,
         "drunix_transactions": total_txs,
         "drunix_mode": drunix_adapter.mode,

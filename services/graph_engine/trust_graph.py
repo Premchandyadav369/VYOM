@@ -160,23 +160,24 @@ class TrustGraphEngine:
                 timestamp=datetime.utcnow().isoformat()
             )
 
-    def get_subgraph_visualization_data(self, node_id: str, depth: int = 2) -> Dict[str, Any]:
+    def get_subgraph_visualization_data(self, node_id: str = "ALL", depth: int = 2) -> Dict[str, Any]:
         """Extracts ego-network nodes and links for frontend graph rendering."""
-        if not self.graph.has_node(node_id):
-            return {"nodes": [{"id": node_id, "name": node_id, "type": "target", "risk": "neutral"}], "links": []}
+        if not node_id or node_id.upper() in ("ALL", "*", ""):
+            nodes_list = list(self.graph.nodes())[:60]
+        elif not self.graph.has_node(node_id):
+            return {"nodes": [{"id": node_id, "label": node_id, "type": "target", "risk_tier": "MEDIUM", "is_mule": False, "trust_score": 0.5}], "links": []}
+        else:
+            sub_nodes = set([node_id])
+            current_layer = set([node_id])
+            for _ in range(depth):
+                next_layer = set()
+                for n in current_layer:
+                    nbrs = set(self.graph.predecessors(n)).union(set(self.graph.successors(n)))
+                    next_layer.update(nbrs)
+                sub_nodes.update(next_layer)
+                current_layer = next_layer
+            nodes_list = list(sub_nodes)[:40]
 
-        sub_nodes = set([node_id])
-        current_layer = set([node_id])
-        for _ in range(depth):
-            next_layer = set()
-            for n in current_layer:
-                nbrs = set(self.graph.predecessors(n)).union(set(self.graph.successors(n)))
-                next_layer.update(nbrs)
-            sub_nodes.update(next_layer)
-            current_layer = next_layer
-
-        # Limit to 30 nodes for clean UI display
-        nodes_list = list(sub_nodes)[:30]
         subgraph = self.graph.subgraph(nodes_list)
 
         out_nodes = []
@@ -204,3 +205,15 @@ class TrustGraphEngine:
             })
 
         return {"nodes": out_nodes, "links": out_links}
+
+    def add_custom_node_or_edge(self, source_id: str, target_id: str, amount: float = 5000.0, is_mule: bool = False, label: Optional[str] = None):
+        """Allows user to inject dynamic nodes and links into the live trust graph."""
+        if not self.graph.has_node(source_id):
+            self.graph.add_node(source_id, name=source_id, type="user", trust_base=0.85, created_at=datetime.utcnow().isoformat())
+        if not self.graph.has_node(target_id):
+            trust = 0.05 if is_mule else 0.75
+            self.graph.add_node(target_id, name=label or target_id, type="mule_hub" if is_mule else "recipient", trust_base=trust, created_at=datetime.utcnow().isoformat())
+        if is_mule:
+            self.known_mule_nodes.add(target_id)
+        self.graph.add_edge(source_id, target_id, edge_type="SUSPECT_OUTFLOW" if is_mule else "PAID", weight=1, volume=amount, timestamp=datetime.utcnow().isoformat())
+        return self.get_subgraph_visualization_data("ALL")

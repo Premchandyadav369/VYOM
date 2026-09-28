@@ -167,5 +167,70 @@ export const api = {
     const res = await fetch(`${API_BASE}/security/audit-logs?limit=${limit}`);
     if (!res.ok) throw new Error('Failed to fetch audit logs');
     return res.json();
+  },
+
+  // Batch Ingestion for BYOD CSV Statements
+  async batchImportPayments(payments: any[]): Promise<any> {
+    const res = await fetch(`${API_BASE}/payments/batch-import`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ payments })
+    });
+    if (!res.ok) throw new Error('Failed to batch import payments');
+    return res.json();
+  },
+
+  // Real-Time NLP Intent Analyzer
+  async analyzeIntent(data: {
+    stated_intent: string;
+    amount: number;
+    recipient_name?: string;
+    category?: string;
+    is_merchant?: boolean;
+  }): Promise<any> {
+    const res = await fetch(`${API_BASE}/intent/analyze`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    if (!res.ok) throw new Error('Failed to analyze intent');
+    return res.json();
+  },
+
+  // Policy Rules
+  async getPolicyRules(): Promise<any[]> {
+    const res = await fetch(`${API_BASE}/policy/rules`);
+    if (!res.ok) throw new Error('Failed to fetch policy rules');
+    return res.json();
+  },
+
+  async togglePolicyRule(ruleId: string): Promise<any> {
+    const res = await fetch(`${API_BASE}/policy/rules/${ruleId}/toggle`, { method: 'POST' });
+    if (!res.ok) throw new Error('Failed to toggle policy rule');
+    return res.json();
+  },
+
+  // Graph Topology & Injection
+  async getFullGraph(): Promise<{ nodes: any[]; links: any[] }> {
+    const res = await fetch(`${API_BASE}/graph/network/ALL`);
+    if (!res.ok) throw new Error('Failed to fetch graph network');
+    return res.json();
+  },
+
+  async injectGraphNode(data: {
+    source_id: string;
+    target_id: string;
+    amount?: number;
+    is_mule?: boolean;
+    label?: string;
+  }): Promise<any> {
+    const res = await fetch(`${API_BASE}/graph/nodes`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    if (!res.ok) throw new Error('Failed to inject graph node');
+    return res.json();
   }
 };
+
