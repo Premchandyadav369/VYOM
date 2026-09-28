@@ -1,0 +1,11 @@
+# Limitations & Honest Engineering Disclosures
+
+In accordance with rigorous academic and industrial engineering practices, we explicitly disclose the constraints and experimental boundaries of this research:
+
+1. **Synthetic Benchmark Data:** All empirical results are evaluated on the synthetic **VERA-PINT** benchmark. While generated using realistic banking distributions (log-normal ticket sizes, real merchant categories, graph-theoretic mule structures) and seeded deterministically (seed=42), real-world consumer behavior exhibits long-tail anomalies and adversarial drift that may differ from synthetic models.
+2. **Absence of Production NPCI / Banking Credentials:** This platform connects to an authentic local Drunix network deployment and high-fidelity Drunix simulator. It does **not** possess production NPCI server certificates, RBI clearinghouse tokens, or live production UPI switch access.
+3. **No Claim of Live Production Banking Settlement:** Simulated rails demonstrate state transition finality. Fiat movement is simulated via deterministic smart contract hooks rather than actual central bank RTGS liquidity adjustments.
+4. **No Claim of Regulatory Approval:** While designed to align with RBI guidelines on digital fraud mitigation and FATF cross-border travel rules, this implementation does not constitute a certified regulatory compliance solution.
+5. **Throughput & TPS Scale:** Experimental latencies (4.2 ms VERA intelligence, ~9.5 ms local DLT commit) were measured in single-node and local cluster testbeds. Production deployments across hundreds of geographically distributed nodes with full TLS mTLS and physical network hops will experience higher latency.
+6. **Model Drift & Adversarial Adaptation:** Fraudsters continuously evolve conversational patterns to evade static NLP filters. Production deployment requires active online continuous learning and human-in-the-loop dispute workflows.
+7. **Privacy-Utility Trade-off:** While private data is isolated to the KeyDB transient store and only hashes reach the ledger, multi-party validation still requires careful key management and zero-knowledge attestation to prevent metadata correlation across consortium banks.

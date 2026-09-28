@@ -1,0 +1,10 @@
+{
+  "num_samples": 250,
+  "total_time_seconds": 1.64,
+  "throughput_tps": 152.4,
+  "vera_latency_mean_ms": 6.4,
+  "drunix_latency_mean_ms": 0.16,
+  "e2e_latency_mean_ms": 6.56,
+  "total_blocks": 1001,
+  "total_txs": 1000
+}

@@ -1,0 +1,122 @@
+[
+  {
+    "threshold": 0.15,
+    "vera_safety": 100.0,
+    "vera_friction": 27.7,
+    "rule_safety": 83.6,
+    "rule_friction": 21.1,
+    "sfe_ratio": 3.61
+  },
+  {
+    "threshold": 0.2,
+    "vera_safety": 100.0,
+    "vera_friction": 27.2,
+    "rule_safety": 83.6,
+    "rule_friction": 21.8,
+    "sfe_ratio": 3.68
+  },
+  {
+    "threshold": 0.25,
+    "vera_safety": 100.0,
+    "vera_friction": 23.8,
+    "rule_safety": 83.6,
+    "rule_friction": 22.2,
+    "sfe_ratio": 4.2
+  },
+  {
+    "threshold": 0.3,
+    "vera_safety": 100.0,
+    "vera_friction": 8.2,
+    "rule_safety": 84.9,
+    "rule_friction": 22.4,
+    "sfe_ratio": 12.2
+  },
+  {
+    "threshold": 0.35,
+    "vera_safety": 99.4,
+    "vera_friction": 2.5,
+    "rule_safety": 85.5,
+    "rule_friction": 22.7,
+    "sfe_ratio": 39.76
+  },
+  {
+    "threshold": 0.4,
+    "vera_safety": 98.7,
+    "vera_friction": 0.2,
+    "rule_safety": 86.8,
+    "rule_friction": 23.8,
+    "sfe_ratio": 197.4
+  },
+  {
+    "threshold": 0.45,
+    "vera_safety": 96.9,
+    "vera_friction": 0.0,
+    "rule_safety": 86.8,
+    "rule_friction": 25.2,
+    "sfe_ratio": 193.8
+  },
+  {
+    "threshold": 0.5,
+    "vera_safety": 84.9,
+    "vera_friction": 0.0,
+    "rule_safety": 86.8,
+    "rule_friction": 25.9,
+    "sfe_ratio": 169.8
+  },
+  {
+    "threshold": 0.55,
+    "vera_safety": 81.1,
+    "vera_friction": 0.0,
+    "rule_safety": 87.4,
+    "rule_friction": 27.4,
+    "sfe_ratio": 162.2
+  },
+  {
+    "threshold": 0.6,
+    "vera_safety": 81.1,
+    "vera_friction": 0.0,
+    "rule_safety": 88.1,
+    "rule_friction": 29.0,
+    "sfe_ratio": 162.2
+  },
+  {
+    "threshold": 0.65,
+    "vera_safety": 77.4,
+    "vera_friction": 0.0,
+    "rule_safety": 88.1,
+    "rule_friction": 30.4,
+    "sfe_ratio": 154.8
+  },
+  {
+    "threshold": 0.7,
+    "vera_safety": 54.7,
+    "vera_friction": 0.0,
+    "rule_safety": 88.7,
+    "rule_friction": 31.7,
+    "sfe_ratio": 109.4
+  },
+  {
+    "threshold": 0.75,
+    "vera_safety": 45.9,
+    "vera_friction": 0.0,
+    "rule_safety": 89.9,
+    "rule_friction": 33.1,
+    "sfe_ratio": 91.8
+  },
+  {
+    "threshold": 0.8,
+    "vera_safety": 28.3,
+    "vera_friction": 0.0,
+    "rule_safety": 90.6,
+    "rule_friction": 34.2,
+    "sfe_ratio": 56.6
+  },
+  {
+    "threshold": 0.85,
+    "vera_safety": 4.4,
+    "vera_friction": 0.0,
+    "rule_safety": 91.2,
+    "rule_friction": 34.9,
+    "sfe_ratio": 8.8
+  }
+]

@@ -1,0 +1,168 @@
+version: '3.8'
+
+networks:
+  drunix_test:
+    name: drunix_test
+
+volumes:
+  postgres_data:
+  keydb_data:
+  orderer_data:
+  peer0_data:
+  peer1_data:
+
+services:
+  # ============================================================================
+  # 1. VERA CORE APPLICATION LAYER
+  # ============================================================================
+  vera-api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    container_name: vera_api
+    ports:
+      - "8000:8000"
+    environment:
+      - ENV=production
+      - API_PORT=8000
+      - DATABASE_URL=postgresql://vera_user:vera_pass@postgres:5432/vera_db
+      - REDIS_URL=redis://keydb:6379/0
+      - DRUNIX_MODE=REAL
+      - DRUNIX_PEER_ENDPOINT=lp1.org1:7051
+      - DRUNIX_ORDERER_ENDPOINT=orderer.example.com:7050
+      - DRUNIX_VS_ENDPOINT=vs1.org1:7071
+      - VERA_SERVICE_SIGNING_KEY=vera_ed25519_service_signing_private_key_demo_secret
+    depends_on:
+      - postgres
+      - keydb
+    networks:
+      - drunix_test
+
+  vera-web:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.web
+    container_name: vera_web
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    depends_on:
+      - vera-api
+    networks:
+      - drunix_test
+
+  # ============================================================================
+  # 2. STATE DATABASE & TRANSIENT STORE (SQL StateDB + KeyDB)
+  # ============================================================================
+  postgres:
+    image: postgres:15-alpine
+    container_name: vera_postgres
+    environment:
+      - POSTGRES_USER=vera_user
+      - POSTGRES_PASSWORD=vera_pass
+      - POSTGRES_DB=vera_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - drunix_test
+
+  keydb:
+    image: eqalpha/keydb:latest
+    container_name: hlf_keydb_org1msp
+    ports:
+      - "6379:6379"
+    volumes:
+      - keydb_data:/data
+    networks:
+      - drunix_test
+
+  # ============================================================================
+  # 3. NPCI DRUNIX PERMISSIONED BLOCKCHAIN (Decoupled LP, CP, VS, Raft Orderer)
+  # ============================================================================
+  orderer.example.com:
+    image: npcioss/drunix-orderer:1.0.0
+    container_name: orderer.example.com
+    environment:
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_LISTENPORT=7050
+      - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
+      - ORDERER_GENERAL_TLS_ENABLED=false
+      - ORDERER_GENERAL_BATCHTIMEOUT=1s
+      - ORDERER_GENERAL_MAXBATCHSIZE=5000
+    ports:
+      - "7050:7050"
+    volumes:
+      - orderer_data:/var/hyperledger/production/orderer
+    networks:
+      - drunix_test
+
+  # LP (Lite Peer) - Endorsement & Chaincode Simulation
+  lp1.org1:
+    image: npcioss/drunix-peer:1.0.0
+    container_name: lp1.org1
+    environment:
+      - CORE_PEER_ID=peer0.org1.example.com
+      - CORE_PEER_ADDRESS=lp1.org1:7051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+      - CORE_PEER_LOCALMSPID=Org1MSP
+      - CORE_PEER_LITEPEER_ENABLED=true
+      - CORE_PEER_KVSTORE_ENABLED=true
+      - CORE_PEER_KVSTORE_ADDRESS=keydb:6379
+      - CORE_LEDGER_STATE_STATEDATABASE=sqldb
+      - CORE_LEDGER_STATE_SQLDBCONFIG_ADDRESS=postgres
+      - CORE_LEDGER_STATE_SQLDBCONFIG_PORT=5432
+      - CORE_LEDGER_STATE_SQLDBCONFIG_DBNAME=vera_db
+      - CORE_LEDGER_STATE_SQLDBCONFIG_USER=vera_user
+      - CORE_LEDGER_STATE_SQLDBCONFIG_PASSWORD=vera_pass
+      - CORE_PEER_COMMITTINGPEER_ID=cp.org1
+      - CORE_PEER_COMMITTINGPEER_ENDPOINT=dns:///cp.org1:7061
+    ports:
+      - "7051:7051"
+    volumes:
+      - peer0_data:/var/hyperledger/production
+    networks:
+      - drunix_test
+
+  # CP (Committing Peer) - Block Validation, MVCC & Ledger Commit
+  cp.org1:
+    image: npcioss/drunix-peer:1.0.0
+    container_name: cp.org1
+    environment:
+      - CORE_PEER_ID=peer1.org1.example.com
+      - CORE_PEER_ADDRESS=cp.org1:7061
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:7061
+      - CORE_PEER_LOCALMSPID=Org1MSP
+      - CORE_PEER_LITEPEER_ENABLED=false
+      - CORE_PEER_VSCCSERVICE_ENABLED=true
+      - CORE_PEER_VSCCSERVICE_ENDPOINT=vs1.org1:7071
+      - CORE_PEER_KVSTORE_ENABLED=true
+      - CORE_PEER_KVSTORE_ADDRESS=keydb:6379
+      - CORE_LEDGER_STATE_STATEDATABASE=sqldb
+      - CORE_LEDGER_STATE_SQLDBCONFIG_ADDRESS=postgres
+      - CORE_LEDGER_STATE_SQLDBCONFIG_PORT=5432
+      - CORE_LEDGER_STATE_SQLDBCONFIG_DBNAME=vera_db
+      - CORE_LEDGER_STATE_SQLDBCONFIG_USER=vera_user
+      - CORE_LEDGER_STATE_SQLDBCONFIG_PASSWORD=vera_pass
+    ports:
+      - "7061:7061"
+    volumes:
+      - peer1_data:/var/hyperledger/production
+    networks:
+      - drunix_test
+
+  # VS (Stateless Validation Service) - Horizontal Signature & Policy Check
+  vs1.org1:
+    image: npcioss/drunix-peer:1.0.0
+    container_name: vs1.org1
+    environment:
+      - CORE_PEER_ID=peer2.org1.example.com
+      - CORE_PEER_ADDRESS=vs1.org1:7071
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:7071
+      - CORE_PEER_LOCALMSPID=Org1MSP
+    ports:
+      - "7071:7071"
+    networks:
+      - drunix_test

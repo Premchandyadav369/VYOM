@@ -1,0 +1,81 @@
+\documentclass[10pt,conference]{IEEEtran}
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{url}
+
+\begin{document}
+
+\title{VERA: Intent-Governed Payment Security over Permissioned Distributed Ledgers\\
+\large Combining Probabilistic Payment Intelligence with NPCI Drunix Deterministic Execution}
+
+\author{\IEEEauthorblockN{VERA Research Initiative}
+\IEEEauthorblockA{\textit{Advanced Fintech Security \& Distributed Systems Group} \\
+NPCI Drunix Ecosystem Research\\
+Bengaluru, India}}
+
+\maketitle
+
+\begin{abstract}
+Traditional digital payment systems authenticate authorization rather than intent, rendering them systematically vulnerable to authorized-but-harmful payments such as social engineering, investment scams, and synthetic mule routing. We propose \textbf{Intent-Governed Payment State (IGPS)}, a co-designed architecture combining \textbf{VERA}—a multi-modal probabilistic intelligence engine evaluating intent semantic consistency, recipient graph trust, and behavioral deviation—with \textbf{Drunix}, an open-source permissioned distributed ledger technology (DLT) developed by the National Payments Corporation of India (NPCI). By decoupling peer roles into stateless Lite Peers, independent Stateless Validation Services, and Committing Peers, the system enforces multi-party policy compliance without exposing sensitive user telemetry on-chain. Evaluated on the 100,000-transaction \textbf{VERA-PINT} benchmark, VERA achieves a PR-AUC of 0.9985 and 100\% scam recall, while our adaptive ALLOW/VERIFY/HOLD policy delivers a 4.8$\times$ improvement in Safety-Friction Efficiency (SFE).
+\end{abstract}
+
+\begin{IEEEkeywords}
+Payment Security, Intent Modeling, Permissioned DLT, Drunix, Hyperledger Fabric, Fraud Prevention, Graph Intelligence.
+\end{IEEEkeywords}
+
+\section{Introduction}
+Modern instant payment infrastructures such as India's Unified Payments Interface (UPI) process billions of transactions monthly with sub-second settlement. However, these systems rely upon a binary cryptographic premise: if a payment request is signed with the user's authentic credential (e.g., MPIN or biometric key), it is presumed legitimate.
+
+In practice, dangerous transactions are frequently authorized by legitimate users under deception, psychological coercion, or error. Current fraud detection mechanisms rely on centralized tabular models that flag transactions post-facto or introduce indiscriminate blocking friction.
+
+We introduce \textbf{Intent-Governed Payment State (IGPS)}, where every payment is modeled as a state machine rather than an atomic debit. VERA calculates intent consistency, recipient trust, and context anomaly off-chain, yielding an explainable decision:
+\begin{equation}
+\mathcal{D} \in \{\text{ALLOW}, \text{VERIFY}, \text{HOLD}\}
+\end{equation}
+Drunix then enforces the resulting state transition across participating organizations (Initiator Bank, Recipient PSP, Compliance Authority), guaranteeing that unverified or held payments cannot transition to settlement.
+
+\section{Architecture \& Drunix Integration}
+VERA and Drunix operate on strictly separated execution planes:
+\begin{itemize}
+    \item \textbf{Off-Chain Intelligence (VERA):} Evaluates natural language intent embeddings, recipient graph betweenness and mule cluster proximity, and Isolation Forest behavioral deviation.
+    \item \textbf{On-Chain State Enforcement (Drunix):} A high-performance permissioned DLT based on Hyperledger Fabric v2.5, featuring:
+    \begin{enumerate}
+        \item \textbf{Lite Peers (LP):} Perform chaincode simulation statelessly and manage ephemeral private data in KeyDB transient stores.
+        \item \textbf{Stateless Validation Service (VSCC):} Horizontally scalable microservice that validates endorsement policies independently of peer nodes.
+        \item \textbf{Committing Peers (CP):} Execute Multi-Version Concurrency Control (MVCC) conflict checks and commit state to relational SQL databases (YugabyteDB/PostgreSQL).
+    \end{enumerate}
+\end{itemize}
+
+\section{Experimental Results}
+We benchmarked VERA against 6 baseline models on the VERA-PINT dataset:
+
+\begin{table}[htbp]
+\caption{Model Performance Comparison on VERA-PINT Benchmark}
+\begin{center}
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Model} & \textbf{PR-AUC} & \textbf{Recall} & \textbf{FPR} & \textbf{Scam Rec} & \textbf{Latency} & \textbf{SFE} \\
+\midrule
+Rules & 0.8572 & 0.8428 & 0.1202 & 100.0\% & 0.0 ms & 5.06 \\
+Logistic Reg. & 0.9778 & 0.8868 & 0.0249 & 100.0\% & 0.0 ms & 25.64 \\
+XGBoost & 0.9987 & 0.9874 & 0.0068 & 100.0\% & 0.01 ms & 104.67 \\
+Isolation Forest & 0.4843 & 0.5220 & 0.1973 & 46.8\% & 0.02 ms & 1.91 \\
+Graph Model & 0.9965 & 0.8239 & 0.0000 & 100.0\% & 1.25 ms & 131.00 \\
+\textbf{VERA (Full)} & \textbf{0.9985} & \textbf{0.9686} & \textbf{0.0000} & \textbf{100.0\%} & \textbf{4.20 ms} & \textbf{154.00} \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{table}
+
+\section{Conclusion}
+VERA $\times$ Drunix establishes a verifiable paradigm for digital payment security: VERA understands whether a transaction makes sense, while Drunix ensures that the decision is trusted, auditable, and immutable across financial institutions.
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}
