@@ -424,7 +424,134 @@ def verify_payment(payment_id: str, db: Session = Depends(get_db)):
     }
 
 
+@app.post("/payments/{payment_id}/approve", tags=["Payments"])
+def approve_payment(payment_id: str, db: Session = Depends(get_db)):
+    """Operator manual override: Approves a payment and commits settlement to Drunix."""
+    p = db.query(DBPayment).filter(DBPayment.payment_id == payment_id).first()
+    if not p:
+        raise HTTPException(status_code=404, detail="Payment not found")
+
+    on_chain = drunix_adapter.chaincode.get_state(f"PAYMENT_{payment_id}")
+    curr_st = on_chain.get("status") if on_chain else p.status
+
+    last_block_num = p.drunix_block_number or 1
+
+    if curr_st == "HOLD":
+        # Release -> Commit -> Settle
+        _, b_rel = drunix_adapter.execute_transaction_lifecycle(
+            function_name="ReleasePayment",
+            args={"payment_id": payment_id}
+        )
+        _, b_commit = drunix_adapter.execute_transaction_lifecycle(
+            function_name="CommitPayment",
+            args={"payment_id": payment_id}
+        )
+        tx_settle, b_settle = drunix_adapter.execute_transaction_lifecycle(
+            function_name="MarkSettled",
+            args={"payment_id": payment_id, "settlement_ref": f"MANUAL_OVERRIDE_{payment_id}"}
+        )
+        last_block_num = b_settle.block_number
+    elif curr_st == "VERIFY_REQUIRED":
+        # Verify -> Commit -> Settle
+        _, b_ver = drunix_adapter.execute_transaction_lifecycle(
+            function_name="VerifyPayment",
+            args={"payment_id": payment_id, "verification_method": "OPERATOR_MANUAL_OVERRIDE"}
+        )
+        _, b_commit = drunix_adapter.execute_transaction_lifecycle(
+            function_name="CommitPayment",
+            args={"payment_id": payment_id}
+        )
+        tx_settle, b_settle = drunix_adapter.execute_transaction_lifecycle(
+            function_name="MarkSettled",
+            args={"payment_id": payment_id, "settlement_ref": f"MANUAL_OVERRIDE_{payment_id}"}
+        )
+        last_block_num = b_settle.block_number
+    elif curr_st in ["ALLOWED", "VERIFIED", "RELEASED"]:
+        # Commit -> Settle
+        _, b_commit = drunix_adapter.execute_transaction_lifecycle(
+            function_name="CommitPayment",
+            args={"payment_id": payment_id}
+        )
+        tx_settle, b_settle = drunix_adapter.execute_transaction_lifecycle(
+            function_name="MarkSettled",
+            args={"payment_id": payment_id, "settlement_ref": f"MANUAL_OVERRIDE_{payment_id}"}
+        )
+        last_block_num = b_settle.block_number
+    elif curr_st == "COMMITTED":
+        tx_settle, b_settle = drunix_adapter.execute_transaction_lifecycle(
+            function_name="MarkSettled",
+            args={"payment_id": payment_id, "settlement_ref": f"MANUAL_OVERRIDE_{payment_id}"}
+        )
+        last_block_num = b_settle.block_number
+
+    p.status = "SETTLED"
+    p.decision = "ALLOW"
+    p.updated_at = datetime.utcnow()
+    history = list(p.state_history or [])
+    history.append({"state": "MANUAL_OPERATOR_APPROVE", "block": last_block_num})
+    p.state_history = history
+    db.commit()
+
+    security_service.log_audit_event(
+        event_type="OPERATOR_MANUAL_APPROVE",
+        actor_id="SOC_ANALYST_01",
+        resource_id=payment_id,
+        details={"override": "ALLOW", "block": last_block_num}
+    )
+
+    return {
+        "payment_id": payment_id,
+        "status": "SETTLED",
+        "decision": "ALLOW",
+        "settled_block": last_block_num
+    }
+
+
+@app.post("/payments/{payment_id}/hold", tags=["Payments"])
+def hold_payment(payment_id: str, db: Session = Depends(get_db)):
+    """Operator manual quarantine: Freezes payment and marks HOLD on Drunix ledger."""
+    p = db.query(DBPayment).filter(DBPayment.payment_id == payment_id).first()
+    if not p:
+        raise HTTPException(status_code=404, detail="Payment not found")
+
+    on_chain = drunix_adapter.chaincode.get_state(f"PAYMENT_{payment_id}")
+    curr_st = on_chain.get("status") if on_chain else p.status
+
+    last_block_num = p.drunix_block_number or 1
+
+    if curr_st not in ["HOLD", "SETTLED"]:
+        tx_hold, b_hold = drunix_adapter.execute_transaction_lifecycle(
+            function_name="HoldPayment",
+            args={"payment_id": payment_id, "reason": "OPERATOR_MANUAL_HOLD_QUARANTINE"}
+        )
+        last_block_num = b_hold.block_number
+
+    p.status = "HOLD"
+    p.decision = "HOLD"
+    p.updated_at = datetime.utcnow()
+    history = list(p.state_history or [])
+    history.append({"state": "MANUAL_OPERATOR_HOLD_QUARANTINE", "block": last_block_num})
+    p.state_history = history
+    db.commit()
+
+    security_service.log_audit_event(
+        event_type="OPERATOR_MANUAL_HOLD",
+        actor_id="SOC_ANALYST_01",
+        resource_id=payment_id,
+        details={"override": "HOLD", "block": last_block_num}
+    )
+
+    return {
+        "payment_id": payment_id,
+        "status": "HOLD",
+        "decision": "HOLD",
+        "hold_block": last_block_num
+    }
+
+
+
 # ------------------------------------------------------------------------------
+
 # 2. Standalone Intent & Risk Engine Endpoints
 # ------------------------------------------------------------------------------
 

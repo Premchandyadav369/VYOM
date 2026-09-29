@@ -48,6 +48,18 @@ export const api = {
     return res.json();
   },
 
+  async approvePayment(id: string): Promise<any> {
+    const res = await fetch(`${API_BASE}/payments/${id}/approve`, { method: 'POST' });
+    if (!res.ok) throw new Error('Failed to approve payment');
+    return res.json();
+  },
+
+  async holdPayment(id: string): Promise<any> {
+    const res = await fetch(`${API_BASE}/payments/${id}/hold`, { method: 'POST' });
+    if (!res.ok) throw new Error('Failed to hold payment');
+    return res.json();
+  },
+
   // Drunix Explorer
   async getNetworkHealth(): Promise<NetworkHealth> {
     const res = await fetch(`${API_BASE}/drunix/network`);

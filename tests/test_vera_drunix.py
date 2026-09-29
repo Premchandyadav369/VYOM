@@ -234,3 +234,33 @@ def test_full_e2e_intent_mismatch_verification_flow():
 
     final_state = drunix.chaincode.get_state(f"PAYMENT_{pid}")
     assert final_state["status"] == "SETTLED"
+
+
+def test_api_approve_and_hold_endpoints():
+    from fastapi.testclient import TestClient
+    from apps.api.main import app
+
+    client = TestClient(app)
+
+    # 1. Create a payment that triggers VERIFY or HOLD
+    create_res = client.post("/payments", json={
+        "sender_id": "test.user@upi",
+        "recipient_id": "customs.clearance.hold@scam",
+        "amount": 45000.0,
+        "stated_intent": "Urgent customs fine payment",
+        "category": "courier_customs_fine"
+    })
+    assert create_res.status_code == 201
+    pid = create_res.json()["payment_id"]
+
+    # 2. Test manual hold endpoint
+    hold_res = client.post(f"/payments/{pid}/hold")
+    assert hold_res.status_code == 200
+    assert hold_res.json()["status"] == "HOLD"
+    assert hold_res.json()["decision"] == "HOLD"
+
+    # 3. Test operator approve override
+    approve_res = client.post(f"/payments/{pid}/approve")
+    assert approve_res.status_code == 200
+    assert approve_res.json()["status"] == "SETTLED"
+    assert approve_res.json()["decision"] == "ALLOW"

@@ -10,6 +10,8 @@ import {
 } from 'lucide-react';
 import { Sidebar } from './components/Sidebar';
 import { Navbar } from './components/Navbar';
+import { StatusBar } from './components/StatusBar';
+import { CommandPalette } from './components/CommandPalette';
 import SoftAurora from './components/SoftAurora';
 import Dock from './components/Dock';
 import { CommandCenter } from './pages/CommandCenter';
@@ -26,12 +28,21 @@ import { SecurityCenter } from './pages/SecurityCenter';
 import { Settings } from './pages/Settings';
 import { TrustGraph } from './pages/TrustGraph';
 import { RiskIntelligence } from './pages/RiskIntelligence';
+import { LivePaymentModal } from './components/LivePaymentModal';
+import { CSVImportModal } from './components/CSVImportModal';
+import { PolicyRulesModal } from './components/PolicyRulesModal';
 import { api } from './services/api';
 
 export const App: React.FC = () => {
   const [currentRoute, setCurrentRoute] = useState<string>('/');
   const [blockHeight, setBlockHeight] = useState<number>(1);
   const [drunixMode, setDrunixMode] = useState<string>('SIMULATOR');
+  const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
+
+  // Global modals triggered from command palette or top-level actions
+  const [showLiveModal, setShowLiveModal] = useState<boolean>(false);
+  const [showCSVModal, setShowCSVModal] = useState<boolean>(false);
+  const [showRulesModal, setShowRulesModal] = useState<boolean>(false);
 
   useEffect(() => {
     api.getNetworkHealth()
@@ -48,9 +59,33 @@ export const App: React.FC = () => {
           setDrunixMode(net.mode);
         })
         .catch(() => {});
-    }, 10000);
+    }, 8000);
 
     return () => clearInterval(interval);
+  }, []);
+
+  // Global Keyboard Shortcuts (⌘K, ⌘1-5)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // ⌘K or Ctrl+K to toggle Command Palette
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setIsSearchOpen((prev) => !prev);
+        return;
+      }
+
+      // Quick numbers ⌘1 through ⌘5 for instant view switching
+      if ((e.metaKey || e.ctrlKey) && !e.shiftKey && !e.altKey) {
+        if (e.key === '1') { e.preventDefault(); navigate('/'); }
+        else if (e.key === '2') { e.preventDefault(); navigate('/payments'); }
+        else if (e.key === '3') { e.preventDefault(); navigate('/risk'); }
+        else if (e.key === '4') { e.preventDefault(); navigate('/graph'); }
+        else if (e.key === '5') { e.preventDefault(); navigate('/drunix'); }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   const navigate = (route: string) => {
@@ -144,48 +179,93 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="relative flex bg-[#08090d] text-[#e6edf3] min-h-screen overflow-x-hidden">
-      {/* Ambient WebGL Soft Aurora Background (Subtle Deep Glow) */}
-      <div className="fixed inset-0 pointer-events-none z-0 opacity-20 overflow-hidden">
+    <div className="relative flex bg-[#07080d] text-[#e6edf3] min-h-screen overflow-x-hidden font-sans">
+      {/* Very subtle ambient dark graphite glow */}
+      <div className="fixed inset-0 pointer-events-none z-0 opacity-10 overflow-hidden">
         <SoftAurora
-          speed={0.22}
-          scale={2.0}
-          brightness={0.35}
-          color1="#0f172a"
-          color2="#1e3a8a"
-          noiseFrequency={1.8}
-          noiseAmplitude={0.7}
-          bandHeight={0.65}
-          bandSpread={1.4}
+          speed={0.15}
+          scale={2.2}
+          brightness={0.25}
+          color1="#0a1020"
+          color2="#111c38"
+          noiseFrequency={1.6}
+          noiseAmplitude={0.5}
+          bandHeight={0.6}
+          bandSpread={1.5}
           octaveDecay={0.1}
-          enableMouseInteraction={true}
-          mouseInfluence={0.12}
+          enableMouseInteraction={false}
+          mouseInfluence={0.05}
         />
       </div>
 
-      {/* Main Sidebar */}
-      <Sidebar currentRoute={currentRoute} navigate={navigate} />
+      {/* Main Enterprise Operations Sidebar */}
+      <Sidebar
+        currentRoute={currentRoute}
+        navigate={navigate}
+        onOpenSearch={() => setIsSearchOpen(true)}
+      />
 
       {/* Workspace Area */}
       <div className="flex-1 ml-64 flex flex-col min-w-0 relative z-10">
-        <Navbar currentRoute={currentRoute} blockHeight={blockHeight} drunixMode={drunixMode} />
-        <main className="flex-1 p-8 max-w-7xl w-full mx-auto pb-28">
+        <Navbar
+          currentRoute={currentRoute}
+          blockHeight={blockHeight}
+          drunixMode={drunixMode}
+          onOpenSearch={() => setIsSearchOpen(true)}
+          navigate={navigate}
+        />
+        <main className="flex-1 p-6 max-w-7xl w-full mx-auto pb-24">
           {renderCurrentPage()}
         </main>
       </div>
 
-      {/* Floating Quick Action Dock */}
-      <div className="fixed bottom-3 left-64 right-0 flex justify-center pointer-events-none z-40">
+      {/* Persistent Operations Telemetry Status Bar */}
+      <StatusBar blockHeight={blockHeight} drunixMode={drunixMode} />
+
+      {/* Floating Quick Navigation Dock */}
+      <div className="fixed bottom-9 left-64 right-0 flex justify-center pointer-events-none z-40">
         <div className="pointer-events-auto">
           <Dock
             items={dockNavItems}
-            panelHeight={52}
-            baseItemSize={38}
-            magnification={52}
-            distance={110}
+            panelHeight={48}
+            baseItemSize={36}
+            magnification={48}
+            distance={100}
           />
         </div>
       </div>
+
+      {/* Global Command Palette (⌘K) */}
+      <CommandPalette
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+        navigate={navigate}
+        onOpenLivePayment={() => setShowLiveModal(true)}
+        onOpenCSVImport={() => setShowCSVModal(true)}
+        onOpenPolicyRules={() => setShowRulesModal(true)}
+      />
+
+      {/* Global Action Modals */}
+      <LivePaymentModal
+        isOpen={showLiveModal}
+        onClose={() => setShowLiveModal(false)}
+        onPaymentCreated={() => {
+          api.getNetworkHealth().then(net => setBlockHeight(net.block_height)).catch(() => {});
+        }}
+      />
+
+      <CSVImportModal
+        isOpen={showCSVModal}
+        onClose={() => setShowCSVModal(false)}
+        onImportComplete={() => {
+          api.getNetworkHealth().then(net => setBlockHeight(net.block_height)).catch(() => {});
+        }}
+      />
+
+      <PolicyRulesModal
+        isOpen={showRulesModal}
+        onClose={() => setShowRulesModal(false)}
+      />
     </div>
   );
 };
