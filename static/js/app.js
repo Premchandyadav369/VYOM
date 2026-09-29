@@ -17,6 +17,7 @@ import { renderInvestigation } from './views/investigation.js';
 import { renderRisk } from './views/risk.js';
 import { renderGraph } from './views/graph.js';
 import { renderDrunix } from './views/drunix.js';
+import { renderNodes } from './views/nodes.js';
 import { renderRules } from './views/rules.js';
 import { renderRemittance } from './views/remittance.js';
 import { renderAssets } from './views/assets.js';
@@ -58,6 +59,9 @@ function renderCurrentView() {
     case 'drunix':
     case 'transactions':
       renderDrunix(container);
+      break;
+    case 'nodes':
+      renderNodes(container);
       break;
     case 'chaos':
       renderChaos(container);

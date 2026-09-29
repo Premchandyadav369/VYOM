@@ -20,6 +20,7 @@ export function renderSidebar(container) {
     {
       title: 'INFRASTRUCTURE',
       items: [
+        { id: 'nodes', label: 'Consortium Nodes' },
         { id: 'drunix', label: 'Drunix' },
         { id: 'chaos', label: 'Consensus Chaos' },
         { id: 'transactions', label: 'Transactions' },

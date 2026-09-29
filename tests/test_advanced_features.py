@@ -234,3 +234,56 @@ def test_chaos_byzantine_fault_injection():
     # Test Byzantine endorsement tamper
     res_byz = chaos_engine.execute_fault_injection("BYZANTINE_ENDORSEMENT_CORRUPTION")
     assert res_byz["expected_outcome"] == "PROPOSAL_REJECTED_CONSENSUS_SAFE"
+
+
+def test_api_enterprise_endpoints():
+    from fastapi.testclient import TestClient
+    from apps.api.main import app
+    client = TestClient(app)
+
+    # 1. Test 1-click Demo Scenario Injector
+    r_scen = client.post("/demo/inject-scenario", json={"scenario_name": "DIGITAL_ARREST"})
+    assert r_scen.status_code == 200
+    scen_data = r_scen.json()
+    assert scen_data["status"] == "SCENARIO_INJECTED"
+    assert scen_data["payment"]["decision"] in ["HOLD", "VERIFY"]
+
+    # 2. Test Batch CSV Statement Ingestion
+    sample_csv = """sender_id,recipient_id,amount,stated_intent,category
+alice@okaxis,blinkit@axis,1200,Fresh grocery order,merchant_order
+bob@sbi,tatapower@icici,2400,Electricity bill,utility_bill"""
+    r_csv = client.post("/statements/upload-csv", json={"csv_content": sample_csv})
+    assert r_csv.status_code == 200
+    csv_data = r_csv.json()
+    assert csv_data["total_parsed"] == 2
+    assert (csv_data["summary"]["allowed"] + csv_data["summary"]["verified"]) >= 1
+
+    # 3. Test Consortium Nodes Topology
+    r_nodes = client.get("/drunix/nodes")
+    assert r_nodes.status_code == 200
+    nodes_data = r_nodes.json()
+    assert len(nodes_data["orderers"]) == 3
+    assert len(nodes_data["peers"]) >= 4
+
+    # 4. Test HSM / FIDO2 Challenge & Verify
+    r_chal = client.post("/security/hsm/challenge")
+    assert r_chal.status_code == 200
+    chal_data = r_chal.json()
+    assert "challenge" in chal_data
+
+    r_hsm = client.post("/security/hsm/verify", json={
+        "credential_id": "YUBIKEY-001",
+        "signature_base64": "ZXhhbXBsZQ==",
+        "client_data_json": "{}",
+        "signer_role": "ROLE_BANK_RISK_LEAD"
+    })
+    assert r_hsm.status_code == 200
+    assert r_hsm.json()["fips_level"] == "FIPS_140_2_LEVEL_3"
+
+    # 5. Test Threat Heatmap
+    r_map = client.get("/analytics/threat-heatmap")
+    assert r_map.status_code == 200
+    map_data = r_map.json()
+    assert len(map_data) >= 5
+    assert any("Jamtara" in r["city"] for r in map_data)
+

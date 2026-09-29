@@ -309,3 +309,32 @@
   cursor: pointer;
 }
 
+/* Regulatory STR Print Styling */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  aside.sidebar, header.topbar, footer.bottom-statusbar, .tabs-header, button {
+    display: none !important;
+  }
+  .app-shell, .main-wrapper, .workspace-split, .workspace-table-pane {
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+  }
+  .investigation-drawer {
+    width: 100% !important;
+    border: none !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    padding: 0 !important;
+  }
+  .code-box, .hex-dump {
+    background: #f8f9fa !important;
+    color: #111111 !important;
+    border: 1px solid #cccccc !important;
+  }
+}
+
+
