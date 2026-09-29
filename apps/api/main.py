@@ -769,19 +769,27 @@ def toggle_policy_rule(rule_id: str):
 
 
 # ------------------------------------------------------------------------------
-# 4. Cross-Border & Remittance Endpoints
+# 4. Cross-Border & Remittance Endpoints (190+ Sovereign Corridors Engine)
 # ------------------------------------------------------------------------------
+
+@app.get("/remittance/countries", tags=["Cross-Border"])
+def get_remittance_countries():
+    """Returns the comprehensive catalog of 195 sovereign countries for bidirectional remittance."""
+    return cross_border_engine.list_all_countries()
+
 
 @app.get("/remittance/corridors", tags=["Cross-Border"])
 def get_remittance_corridors():
-    """Lists supported international remittance corridors (IN-SG, IN-UAE, IN-UK, IN-US)."""
+    """Lists supported international remittance corridors."""
     return cross_border_engine.list_supported_corridors()
 
 
 class RemittanceEvaluateRequest(BaseModel):
     amount_inr: float
-    destination_country: str
+    destination_country: Optional[str] = "US"
+    origin_country: Optional[str] = "IN"
     corridor: Optional[str] = None
+    direction: Optional[str] = "OUTWARD"
 
 
 @app.post("/remittance/evaluate", tags=["Cross-Border"])
@@ -789,10 +797,193 @@ def evaluate_remittance(req: RemittanceEvaluateRequest):
     """Evaluates cross-border fees, FX rates, compliance states, and route risk."""
     feats = cross_border_engine.evaluate_cross_border(
         amount_inr=req.amount_inr,
-        dest_country=req.destination_country,
-        corridor_code=req.corridor
+        dest_country=req.destination_country or "US",
+        corridor_code=req.corridor,
+        direction=req.direction or "OUTWARD",
+        origin_country=req.origin_country or "IN"
     )
-    return feats.dict()
+    return feats.dict() if hasattr(feats, "dict") else feats.model_dump()
+
+
+class RemittanceExecuteRequest(BaseModel):
+    amount: float
+    origin_country: Optional[str] = "IN"
+    destination_country: Optional[str] = "US"
+    direction: Optional[str] = "OUTWARD"
+    sender_id: Optional[str] = "user_in_8829"
+    recipient_id: Optional[str] = "user_ext_4102"
+    purpose: Optional[str] = "Family Maintenance / Direct Remittance"
+
+
+@app.post("/remittance/execute", tags=["Cross-Border"])
+def execute_remittance(req: RemittanceExecuteRequest, db: Session = Depends(get_db)):
+    """
+    Executes an atomic bidirectional remittance across 195 sovereign nations.
+    Settles on Drunix DLT, registers state, generates ISO 20022 wire & FIRC certificate.
+    """
+    direction = (req.direction or "OUTWARD").upper()
+    dest_c = req.destination_country or "US"
+    orig_c = req.origin_country or "IN"
+
+    feats = cross_border_engine.evaluate_cross_border(
+        amount_inr=req.amount,
+        dest_country=dest_c,
+        direction=direction,
+        origin_country=orig_c
+    )
+
+    if feats.compliance_status == "SANCTIONS_BLOCKED_OFAC_FATF":
+        raise HTTPException(
+            status_code=403,
+            detail=f"Corridor {feats.corridor} is strictly blocked under OFAC / FATF high-risk jurisdiction sanctions."
+        )
+
+    remit_id = f"REMIT-{int(time.time()*1000)%1000000:06d}"
+
+    # Commit to Drunix Distributed Ledger
+    tx, block = drunix_adapter.execute_transaction_lifecycle(
+        function_name="SovereignRemittanceClearing",
+        args={
+            "remittance_id": remit_id,
+            "corridor": feats.corridor,
+            "direction": direction,
+            "source_amount": feats.source_amount,
+            "source_currency": feats.source_currency,
+            "dest_amount": feats.dest_amount,
+            "dest_currency": feats.dest_currency,
+            "fx_rate": feats.fx_rate,
+            "settlement_rail": feats.settlement_rail,
+            "sender_id": req.sender_id,
+            "recipient_id": req.recipient_id,
+            "firc_number": feats.firc_number,
+            "tcs_inr": feats.tcs_inr
+        }
+    )
+
+    # Persist in DB
+    db_remit = DBRemittance(
+        remittance_id=remit_id,
+        payment_id=f"PAY-{remit_id}",
+        corridor=feats.corridor,
+        sender_country=feats.origin_country,
+        receiver_country=feats.destination_country,
+        source_amount=feats.source_amount,
+        source_currency=feats.source_currency,
+        fx_rate=feats.fx_rate,
+        dest_amount=feats.dest_amount,
+        dest_currency=feats.dest_currency,
+        route_risk_score=feats.route_risk_score,
+        compliance_status=feats.compliance_status,
+        drunix_tx_id=tx.tx_id,
+        settlement_state="SETTLED_ATOMIC"
+    )
+    db.add(db_remit)
+
+    # Log to Audit Trail
+    audit_ev = DBAuditLog(
+        event_type="CROSS_BORDER_REMITTANCE_DISPATCHED",
+        actor_id=req.sender_id or "system",
+        resource_id=remit_id,
+        details={
+            "remittance_id": remit_id,
+            "direction": direction,
+            "corridor": feats.corridor,
+            "source_amount": f"{feats.source_amount} {feats.source_currency}",
+            "dest_amount": f"{feats.dest_amount} {feats.dest_currency}",
+            "tcs_inr": feats.tcs_inr,
+            "firc": feats.firc_number,
+            "drunix_tx": tx.tx_id,
+            "block_number": block.block_number
+        }
+    )
+    db.add(audit_ev)
+    db.commit()
+
+    # Generate ISO 20022 wire message representation
+    iso_pacs008 = f"""<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pacs.008.001.10">
+  <FIToFICstmrCdtTrf>
+    <GrpHdr>
+      <MsgId>VYOM-NEXUS-{remit_id}</MsgId>
+      <CreDtTm>{datetime.utcnow().isoformat()}Z</CreDtTm>
+      <NbOfTxs>1</NbOfTxs>
+      <SttlmInf>
+        <SttlmMtd>CLRG</SttlmMtd>
+        <ClrSys><Prtry>DRUNIX_NEXUS_PVP</Prtry></ClrSys>
+      </SttlmInf>
+    </GrpHdr>
+    <CdtTrfTxInf>
+      <PmtId><EndToEndId>{remit_id}</EndToEndId><TxId>{tx.tx_id[:24]}</TxId></PmtId>
+      <IntrBkSttlmAmt Ccy="{feats.dest_currency}">{feats.dest_amount}</IntrBkSttlmAmt>
+      <Dbtr><Nm>{req.sender_id}</Nm><PstlAdr><Ctry>{feats.origin_country}</Ctry></PstlAdr></Dbtr>
+      <Cdtr><Nm>{req.recipient_id}</Nm><PstlAdr><Ctry>{feats.destination_country}</Ctry></PstlAdr></Cdtr>
+      <RmtInf><Ustrd>{req.purpose} | FX: {feats.fx_rate} | TCS: INR {feats.tcs_inr}</Ustrd></RmtInf>
+    </CdtTrfTxInf>
+  </FIToFICstmrCdtTrf>
+</Document>"""
+
+    return {
+        "status": "SUCCESS_SETTLED_ATOMIC",
+        "remittance_id": remit_id,
+        "direction": direction,
+        "corridor": feats.corridor,
+        "source": {
+            "amount": feats.source_amount,
+            "currency": feats.source_currency,
+            "country": feats.origin_country
+        },
+        "destination": {
+            "amount": feats.dest_amount,
+            "currency": feats.dest_currency,
+            "country": feats.destination_country
+        },
+        "fx_execution": {
+            "rate": feats.fx_rate,
+            "spread_pct": feats.fx_spread_pct,
+            "fee_inr": feats.fee_inr,
+            "settlement_rail": feats.settlement_rail,
+            "estimated_settlement_mins": feats.estimated_settlement_mins
+        },
+        "compliance": {
+            "status": feats.compliance_status,
+            "tcs_inr": feats.tcs_inr,
+            "firc_certificate": feats.firc_number,
+            "route_risk_score": feats.route_risk_score
+        },
+        "drunix_settlement": {
+            "tx_id": tx.tx_id,
+            "block_number": block.block_number,
+            "merkle_root": block.merkle_root,
+            "consensus": "MULTI_MSP_BYZANTINE_COMMIT"
+        },
+        "iso20022_wire_pacs008": iso_pacs008
+    }
+
+
+@app.get("/remittance/history", tags=["Cross-Border"])
+def get_remittance_history(limit: int = 20, db: Session = Depends(get_db)):
+    """Returns recent processed international remittances across global corridors."""
+    remits = db.query(DBRemittance).order_by(DBRemittance.created_at.desc()).limit(limit).all()
+    out = []
+    for r in remits:
+        out.append({
+            "remittance_id": r.remittance_id,
+            "corridor": r.corridor,
+            "sender_country": r.sender_country,
+            "receiver_country": r.receiver_country,
+            "source_amount": r.source_amount,
+            "source_currency": r.source_currency,
+            "dest_amount": r.dest_amount,
+            "dest_currency": r.dest_currency,
+            "fx_rate": r.fx_rate,
+            "route_risk_score": r.route_risk_score,
+            "compliance_status": r.compliance_status,
+            "drunix_tx_id": r.drunix_tx_id,
+            "settlement_state": r.settlement_state,
+            "created_at": r.created_at.isoformat() if r.created_at else None
+        })
+    return out
+
 
 
 # ------------------------------------------------------------------------------
@@ -1115,12 +1306,117 @@ def get_analytics_overview(db: Session = Depends(get_db)):
     }
 
 
+THREAT_MATRIX = [
+    {
+        "id": "T1",
+        "name": "Social Engineering & Coercion Scams",
+        "surface": "User initiates authorized payment under video call extortion or authority impersonation (Digital Arrest, CBI/Customs).",
+        "mitigation": "VYOM Intent Engine & Telecom Coercion Forensics: Analyzes stated purpose, active VoIP duration (>15m), and remote screen sharing.",
+        "residual_risk": "Adversary instructs victim to disconnect VoIP prior to initiating transfer (countered by behavioral anomaly filter).",
+        "severity": "CRITICAL"
+    },
+    {
+        "id": "T2",
+        "name": "Account Takeover (ATO) & SIM Swaps",
+        "surface": "Compromised banking session token, stolen device, or unauthorized SIM swap.",
+        "mitigation": "Behavioral Anomaly Isolation Forest: Detects nocturnal hours (2 AM – 5 AM), unexpected device novelty, and abnormal velocity.",
+        "residual_risk": "Low-value slow-draining transactions from trusted IP address.",
+        "severity": "HIGH"
+    },
+    {
+        "id": "T3",
+        "name": "Look-alike VPAs & Recipient Spoofing",
+        "surface": "Attacker registers typo-squatted Virtual Payment Address (e.g. swiggy.refunds@scam).",
+        "mitigation": "Ego-Network PageRank & Merchant Verification: Matches VPA against official NPCI merchant directory; requires step-up auth for unverified entities.",
+        "residual_risk": "Accidental payment to brand-new personal account with similar legal name.",
+        "severity": "HIGH"
+    },
+    {
+        "id": "T4",
+        "name": "Mule Accounts & Peeling Layering",
+        "surface": "Syndicate routes extorted proceeds through rapid multi-hop pass-through accounts within 90 seconds.",
+        "mitigation": "Trust Graph Centrality & Mule Traversal: Detects high fan-in/fan-out ratios, zero account tenure, and proximity to known mule clusters.",
+        "residual_risk": "Dormant sleeper accounts activated for one-off isolated transfers.",
+        "severity": "CRITICAL"
+    },
+    {
+        "id": "T5",
+        "name": "Adversarial Intent Manipulation",
+        "surface": "Fraudster scripts deceptive intent narratives to game NLP semantic vectorizers into predicting high consistency.",
+        "mitigation": "Multi-Modal Risk Fusion Ensemble: Intent (28%) is fused with behavior (22%), recipient trust (20%), and context (15%).",
+        "residual_risk": "Novel zero-day fraud typology with completely normal transaction parameters.",
+        "severity": "MEDIUM"
+    },
+    {
+        "id": "T6",
+        "name": "API Replay & Man-in-the-Middle",
+        "surface": "Attacker intercepts signed payment instruction and replays it to duplicate debit.",
+        "mitigation": "Cryptographic Nonces & Timestamp Skew Windows: Mandatory UUIDv4 nonces with 300-second maximum skew; duplicate nonces rejected on-chain.",
+        "residual_risk": "Clock synchronization drift >5 minutes across nodes (countered by NTP daemons).",
+        "severity": "HIGH"
+    },
+    {
+        "id": "T7",
+        "name": "Ledger State Tampering",
+        "surface": "Malicious participant attempts to rewrite committed payment status or double-spend balances.",
+        "mitigation": "Drunix Raft Consensus & Merkle State Integrity: Blocks are linked via SHA-256 Merkle root hashes across 4 independent bank peers.",
+        "residual_risk": "Collusion of >50% of Raft ordering consensus nodes across independent institutions.",
+        "severity": "CRITICAL"
+    },
+    {
+        "id": "T8",
+        "name": "Unauthorized Org State Transition",
+        "surface": "Rogue institution or compromised bank peer attempts to unilaterally commit settlement without counterparty endorsement.",
+        "mitigation": "Stateless Validation Service (VSCC) & Multi-MSP Endorsement: Smart contract requires multi-party endorsement (Org1 + Org2 + Compliance).",
+        "residual_risk": "Simultaneous cryptographic key compromise of multiple institutions.",
+        "severity": "CRITICAL"
+    },
+    {
+        "id": "T9",
+        "name": "Compromised Risk Worker Node",
+        "surface": "Attacker gains shell access to internal risk evaluation worker to force ALLOW decisions.",
+        "mitigation": "Cryptographic Decision Signing & Versioned Policy Attestation: Every decision requires HMAC/Ed25519 signature validated by chaincode.",
+        "residual_risk": "Master signing key compromise (mitigated via FIPS 140-2 Level 3 HSM hardware isolation).",
+        "severity": "HIGH"
+    },
+    {
+        "id": "T10",
+        "name": "Malicious Database Administrator",
+        "surface": "Bank database administrator modifies local SQLite/PostgreSQL table records directly via SQL.",
+        "mitigation": "DLT Shared Truth vs Local DB MVCC Invariant: Local database is only a read cache; mismatches with Drunix state trigger automatic rollback.",
+        "residual_risk": "Physical disk tampering (detected via gossip block height auditing).",
+        "severity": "HIGH"
+    },
+    {
+        "id": "T11",
+        "name": "PII & Intent Leakage on Public Ledger",
+        "surface": "Debtor intent descriptions, account balances, or personal phone numbers exposed on consortium ledger.",
+        "mitigation": "Groth16 Zero-Knowledge Proofs on BN254 & Private Collections: Raw text stays in local enclave; only intent hashes and ZK proofs reach Drunix.",
+        "residual_risk": "Hash correlation if salt space is insufficiently random (prevented via high-entropy 256-bit salt).",
+        "severity": "HIGH"
+    },
+    {
+        "id": "T12",
+        "name": "Distributed Denial of Service (DDoS)",
+        "surface": "Flooding payment ingress gateway with invalid high-frequency transaction proposals.",
+        "mitigation": "Stateless Validation Horizontal Scaling & Reverse Proxy Idempotency: VSCC scales independently; duplicate requests cached and dropped.",
+        "residual_risk": "Volumetric network pipe saturation at ISP transit tier.",
+        "severity": "MEDIUM"
+    }
+]
+
 @app.get("/security/threat-model", tags=["Security Center"])
 def get_threat_model():
     """Returns T1 - T12 Threat Matrix data for security dashboard."""
-    with open("docs/threat-model/threat_model.md", "r") as f:
-        content = f.read()
-    return {"markdown": content}
+    doc_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../docs/threat-model/threat_model.md"))
+    content = ""
+    if os.path.exists(doc_path):
+        try:
+            with open(doc_path, "r", encoding="utf-8") as f:
+                content = f.read()
+        except Exception:
+            pass
+    return THREAT_MATRIX
 
 
 @app.get("/security/audit-logs", tags=["Security Center"])

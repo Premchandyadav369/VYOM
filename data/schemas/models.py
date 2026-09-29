@@ -132,6 +132,14 @@ class CrossBorderFeatures(BaseModel):
     country_risk_score: float = 0.0
     route_risk_score: float = 0.0
     compliance_status: str = "DOMESTIC_EXEMPT"  # SANCTIONS_CLEARED, PEP_CHECK_PASSED, etc.
+    direction: str = "OUTWARD"  # "OUTWARD" (India -> World) or "INWARD" (World -> India)
+    source_amount: float = 0.0
+    dest_amount: float = 0.0
+    source_currency: str = "INR"
+    dest_currency: str = "INR"
+    tcs_inr: float = 0.0
+    firc_number: Optional[str] = None
+    settlement_rail: Optional[str] = None
 
 
 class UnifiedRiskDecision(BaseModel):

@@ -1,17 +1,22 @@
 """
-VERA Cross-Border Remittance Engine
-Evaluates international payment corridors (India -> SG, UAE, UK, US),
-calculates FX spreads, route risk, compliance screening states, and settlement latencies.
+VYOM Cross-Border Remittance Engine
+Evaluates bidirectional international payment corridors across 195 sovereign nations (ISO 3166-1).
+Supports OUTWARD remittances (India -> World) under RBI LRS & TCS rules,
+and INWARD remittances (World -> India) over Project Nexus / NPCI Drunix DLT with instant FIRC generation.
 """
 
 from typing import Dict, Any, List, Optional
 from datetime import datetime
+import hashlib
+import time
 from data.schemas.models import CrossBorderFeatures
+from services.cross_border_engine.global_countries import GLOBAL_COUNTRIES, GLOBAL_COUNTRIES_BY_CODE
 
 
 class CrossBorderEngine:
-    """Manages cross-border payment risk, FX corridor routing, and compliance states."""
+    """Manages cross-border payment risk, FX corridor routing, and compliance states across 195 sovereign nations."""
 
+    # Top featured corridors for rapid selection
     CORRIDORS = {
         "IN-SG": {
             "name": "India - Singapore (UPI-PayNow Linkage)",
@@ -63,82 +68,194 @@ class CrossBorderEngine:
         }
     }
 
-    HIGH_RISK_COUNTRIES = {"IR", "KP", "SY", "RU", "MM"}
+    # FATF Blacklist / High-Risk Jurisdictions subject to mandatory OFAC / UN sanctions block
+    HIGH_RISK_COUNTRIES = {"IR", "KP", "SY", "RU", "CU", "MM"}
+
+    def __init__(self):
+        self.all_countries = GLOBAL_COUNTRIES
+        self.countries_by_code = GLOBAL_COUNTRIES_BY_CODE
+
+    def list_all_countries(self) -> List[Dict[str, Any]]:
+        """Returns the full catalog of 195 sovereign countries with live FX & rail metadata."""
+        return self.all_countries
+
+    def list_supported_corridors(self) -> List[Dict[str, Any]]:
+        """Returns metadata for key cross-border corridors."""
+        return [
+            {"code": k, **v} for k, v in self.CORRIDORS.items()
+        ]
 
     def evaluate_cross_border(
         self,
         amount_inr: float,
         dest_country: str,
         corridor_code: Optional[str] = None,
-        recipient_id: Optional[str] = None
+        recipient_id: Optional[str] = None,
+        direction: str = "OUTWARD",
+        origin_country: str = "IN"
     ) -> CrossBorderFeatures:
-        """Evaluates FX rates, routing safety, and compliance risk for international transactions."""
-        dest_upper = dest_country.upper()
+        """
+        Evaluates FX rates, routing safety, LRS/TCS compliance, and settlement latency
+        for bidirectional international remittances across 195 sovereign nations.
+        """
+        dir_clean = direction.upper() if direction else "OUTWARD"
+        
+        # Determine the target foreign country code
+        if dir_clean == "INWARD":
+            foreign_code = origin_country.upper() if origin_country and origin_country.upper() != "IN" else dest_country.upper()
+            if foreign_code == "IN":
+                foreign_code = "US"  # Fallback foreign source
+            origin_c = foreign_code
+            dest_c = "IN"
+        else:
+            foreign_code = dest_country.upper() if dest_country and dest_country.upper() != "IN" else "US"
+            origin_c = "IN"
+            dest_c = foreign_code
 
-        # Sanctions check
-        if dest_upper in self.HIGH_RISK_COUNTRIES:
+        # Check Sanctions / FATF Blacklist
+        is_sanctioned = foreign_code in self.HIGH_RISK_COUNTRIES
+        country_meta = self.countries_by_code.get(foreign_code)
+        if country_meta and country_meta.get("sanctioned", False):
+            is_sanctioned = True
+
+        if is_sanctioned:
+            corridor_label = f"{origin_c}-{dest_c}"
+            cur_pair = f"INR/{foreign_code}" if dir_clean == "OUTWARD" else f"{foreign_code}/INR"
             return CrossBorderFeatures(
                 is_cross_border=True,
-                origin_country="IN",
-                destination_country=dest_upper,
-                corridor=f"IN-{dest_upper}",
-                currency_pair=f"INR/{dest_upper}",
+                origin_country=origin_c,
+                destination_country=dest_c,
+                corridor=corridor_label,
+                currency_pair=cur_pair,
                 fx_rate=0.0,
                 fx_spread_pct=0.0,
                 fee_inr=0.0,
                 estimated_settlement_mins=0,
                 country_risk_score=0.99,
                 route_risk_score=0.99,
-                compliance_status="SANCTIONS_BLOCKED_OFAC_FATF"
+                compliance_status="SANCTIONS_BLOCKED_OFAC_FATF",
+                direction=dir_clean,
+                source_amount=amount_inr,
+                dest_amount=0.0,
+                source_currency="INR" if dir_clean == "OUTWARD" else (country_meta.get("currency", "USD") if country_meta else "USD"),
+                dest_currency=country_meta.get("currency", "USD") if dir_clean == "OUTWARD" and country_meta else "INR",
+                tcs_inr=0.0,
+                firc_number=None,
+                settlement_rail="BLOCKED_BY_SANCTIONS_FIREWALL"
             )
 
-        # Match corridor
-        matched_key = corridor_code if corridor_code in self.CORRIDORS else None
-        if not matched_key:
-            for k, cfg in self.CORRIDORS.items():
-                if cfg["dest_country"] == dest_upper:
-                    matched_key = k
-                    break
+        # Lookup country metadata with default fallback
+        if not country_meta:
+            country_meta = {
+                "code": foreign_code,
+                "name": f"Nation ({foreign_code})",
+                "currency": "USD",
+                "flag": "🌐",
+                "base_fx_rate": 0.0120,
+                "fx_spread_pct": 1.50,
+                "flat_fee_inr": 200.0,
+                "avg_settlement_mins": 15,
+                "country_risk": 0.08,
+                "rail": "SWIFT GPI / Project Nexus",
+                "regime": "INTERNATIONAL_CORRESPONDENT",
+                "sanctioned": False
+            }
 
-        if not matched_key:
-            matched_key = "IN-US"  # Default international corridor
+        foreign_currency = country_meta.get("currency", "USD")
+        base_rate = country_meta.get("base_fx_rate", 0.0120)
+        spread = country_meta.get("fx_spread_pct", 1.20)
+        country_risk = country_meta.get("country_risk", 0.06)
+        settlement_rail = country_meta.get("rail", "Project Nexus / Drunix DLT")
 
-        cfg = self.CORRIDORS[matched_key]
-        dest_currency = cfg["currency"]
-        fx_rate = cfg["base_fx_rate"]
-        spread = cfg["fx_spread_pct"]
-        fee = cfg["flat_fee_inr"] + (amount_inr * (spread / 100.0))
+        # Bidirectional Calculation
+        if dir_clean == "INWARD":
+            # Foreign Currency -> INR
+            corridor_label = f"{foreign_code}-IN"
+            cur_pair = f"{foreign_currency}/INR"
+            source_amount = float(amount_inr)
+            # 1 Unit of Foreign Currency to INR
+            fx_rate = round(1.0 / max(1e-6, base_rate), 4)
+            # Destination amount in INR
+            dest_amount = round(source_amount * fx_rate * (1.0 - (spread / 100.0)), 2)
+            fee_inr = round(country_meta.get("flat_fee_inr", 100.0), 2)
+            tcs_inr = 0.0  # Inward foreign remittance is 0% TCS under FEMA
+            
+            # Instant Foreign Inward Remittance Certificate (FIRC)
+            firc_hash = hashlib.sha256(f"FIRC-{foreign_code}-{source_amount}-{time.time()}".encode()).hexdigest()[:10].upper()
+            firc_number = f"FIRC-2026-{foreign_code}-{firc_hash}"
+            compliance_status = "INWARD_FIRC_ISSUED_SETTLED"
+            est_mins = max(1, min(5, country_meta.get("avg_settlement_mins", 3)))
+            route_risk = round(min(0.99, country_risk + 0.03), 3)
 
-        # Size-based compliance tier
-        if amount_inr > 700000.0:  # RBI LRS TCS threshold (7 Lakhs INR)
-            compliance_status = "LRS_TCS_AUDIT_REQUIRED"
-            additional_route_risk = 0.25
-        elif amount_inr > 200000.0:
-            compliance_status = "EDD_DOCUMENTATION_VERIFIED"
-            additional_route_risk = 0.10
+            return CrossBorderFeatures(
+                is_cross_border=True,
+                origin_country=foreign_code,
+                destination_country="IN",
+                corridor=corridor_label,
+                currency_pair=cur_pair,
+                fx_rate=fx_rate,
+                fx_spread_pct=spread,
+                fee_inr=fee_inr,
+                estimated_settlement_mins=est_mins,
+                country_risk_score=country_risk,
+                route_risk_score=route_risk,
+                compliance_status=compliance_status,
+                direction="INWARD",
+                source_amount=source_amount,
+                dest_amount=dest_amount,
+                source_currency=foreign_currency,
+                dest_currency="INR",
+                tcs_inr=tcs_inr,
+                firc_number=firc_number,
+                settlement_rail=f"Project Nexus / Drunix DLT ({settlement_rail})"
+            )
         else:
-            compliance_status = "STANDARD_REMITTANCE_CLEARED"
-            additional_route_risk = 0.0
+            # OUTWARD: INR -> Foreign Currency
+            corridor_label = f"IN-{foreign_code}"
+            cur_pair = f"INR/{foreign_currency}"
+            source_amount = float(amount_inr)
+            fx_rate = base_rate
+            dest_amount = round(source_amount * fx_rate * (1.0 - (spread / 100.0)), 2)
+            fee_inr = round(country_meta.get("flat_fee_inr", 150.0) + (source_amount * (spread / 100.0)), 2)
 
-        total_route_risk = min(0.99, cfg["route_risk"] + additional_route_risk)
+            # RBI Liberalised Remittance Scheme (LRS) & Tax Collected at Source (TCS):
+            # Threshold: INR 7,00,000 (~7 Lakhs) per financial year.
+            # 20% TCS applies on the amount exceeding ₹7,00,000 for standard remittances.
+            if source_amount > 700000.0:
+                tcs_inr = round((source_amount - 700000.0) * 0.20, 2)
+                compliance_status = "LRS_TCS_AUDIT_REQUIRED"
+                additional_route_risk = 0.22
+            elif source_amount > 200000.0:
+                tcs_inr = 0.0
+                compliance_status = "EDD_DOCUMENTATION_VERIFIED"
+                additional_route_risk = 0.08
+            else:
+                tcs_inr = 0.0
+                compliance_status = "STANDARD_REMITTANCE_CLEARED"
+                additional_route_risk = 0.0
 
-        return CrossBorderFeatures(
-            is_cross_border=True,
-            origin_country="IN",
-            destination_country=cfg["dest_country"],
-            corridor=matched_key,
-            currency_pair=f"INR/{dest_currency}",
-            fx_rate=fx_rate,
-            fx_spread_pct=spread,
-            fee_inr=round(fee, 2),
-            estimated_settlement_mins=cfg["avg_settlement_mins"],
-            country_risk_score=cfg["country_risk"],
-            route_risk_score=round(total_route_risk, 3),
-            compliance_status=compliance_status
-        )
+            route_risk = round(min(0.99, country_risk + additional_route_risk + 0.04), 3)
+            est_mins = country_meta.get("avg_settlement_mins", 10)
 
-    def list_supported_corridors(self) -> List[Dict[str, Any]]:
-        """Returns metadata for all available cross-border remittance corridors."""
-        return [
-            {"code": k, **v} for k, v in self.CORRIDORS.items()
-        ]
+            return CrossBorderFeatures(
+                is_cross_border=True,
+                origin_country="IN",
+                destination_country=foreign_code,
+                corridor=corridor_label,
+                currency_pair=cur_pair,
+                fx_rate=fx_rate,
+                fx_spread_pct=spread,
+                fee_inr=fee_inr,
+                estimated_settlement_mins=est_mins,
+                country_risk_score=country_risk,
+                route_risk_score=route_risk,
+                compliance_status=compliance_status,
+                direction="OUTWARD",
+                source_amount=source_amount,
+                dest_amount=dest_amount,
+                source_currency="INR",
+                dest_currency=foreign_currency,
+                tcs_inr=tcs_inr,
+                firc_number=None,
+                settlement_rail=f"Drunix Nexus Gateway ({settlement_rail})"
+            )

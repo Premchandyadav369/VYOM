@@ -287,3 +287,81 @@ bob@sbi,tatapower@icici,2400,Electricity bill,utility_bill"""
     assert len(map_data) >= 5
     assert any("Jamtara" in r["city"] for r in map_data)
 
+
+def test_sovereign_190_countries_bidirectional_remittances():
+    from fastapi.testclient import TestClient
+    from apps.api.main import app
+    client = TestClient(app)
+
+    # 1. Test 195 Sovereign Countries Catalog
+    r_countries = client.get("/remittance/countries")
+    assert r_countries.status_code == 200
+    countries_list = r_countries.json()
+    assert len(countries_list) >= 185
+    sg = next(c for c in countries_list if c["code"] == "SG")
+    assert sg["currency"] == "SGD"
+    assert "PayNow" in sg["rail"]
+
+    # 2. Test Outward Evaluation with RBI LRS & TCS threshold (> 7 Lakhs)
+    r_eval_out = client.post("/remittance/evaluate", json={
+        "amount_inr": 1000000.0,  # 10 Lakhs INR
+        "destination_country": "SG",
+        "direction": "OUTWARD"
+    })
+    assert r_eval_out.status_code == 200
+    eval_out = r_eval_out.json()
+    assert eval_out["direction"] == "OUTWARD"
+    assert eval_out["destination_country"] == "SG"
+    assert eval_out["compliance_status"] == "LRS_TCS_AUDIT_REQUIRED"
+    # 20% on (1,000,000 - 700,000) = 20% of 300,000 = 60,000 INR
+    assert eval_out["tcs_inr"] == 60000.0
+    assert eval_out["dest_amount"] > 0
+
+    # 3. Test Inward Evaluation (Foreign -> India) with Instant FIRC & 0% TCS
+    r_eval_in = client.post("/remittance/evaluate", json={
+        "amount_inr": 5000.0,  # 5,000 USD
+        "origin_country": "US",
+        "destination_country": "IN",
+        "direction": "INWARD"
+    })
+    assert r_eval_in.status_code == 200
+    eval_in = r_eval_in.json()
+    assert eval_in["direction"] == "INWARD"
+    assert eval_in["destination_country"] == "IN"
+    assert eval_in["tcs_inr"] == 0.0
+    assert eval_in["firc_number"].startswith("FIRC-2026-US-")
+    assert eval_in["compliance_status"] == "INWARD_FIRC_ISSUED_SETTLED"
+
+    # 4. Test Sanctions Screening Blocking (OFAC / FATF High Risk)
+    r_eval_sanctioned = client.post("/remittance/evaluate", json={
+        "amount_inr": 50000.0,
+        "destination_country": "KP",
+        "direction": "OUTWARD"
+    })
+    assert r_eval_sanctioned.status_code == 200
+    assert r_eval_sanctioned.json()["compliance_status"] == "SANCTIONS_BLOCKED_OFAC_FATF"
+
+    # 5. Test Full Remittance Execution on Drunix DLT
+    r_exec = client.post("/remittance/execute", json={
+        "amount": 350000.0,
+        "origin_country": "IN",
+        "destination_country": "AE",
+        "direction": "OUTWARD",
+        "sender_id": "citi_treasury_in",
+        "recipient_id": "citi_treasury_ae",
+        "purpose": "Trade Invoicing & Software Export"
+    })
+    assert r_exec.status_code == 200
+    exec_data = r_exec.json()
+    assert exec_data["status"] == "SUCCESS_SETTLED_ATOMIC"
+    assert "drunix_settlement" in exec_data
+    assert exec_data["drunix_settlement"]["block_number"] >= 1
+    assert "iso20022_wire_pacs008" in exec_data
+    assert "<FIToFICstmrCdtTrf>" in exec_data["iso20022_wire_pacs008"]
+
+    # 6. Test History Retrieval
+    r_hist = client.get("/remittance/history")
+    assert r_hist.status_code == 200
+    assert len(r_hist.json()) >= 1
+
+

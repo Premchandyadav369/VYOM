@@ -34,6 +34,12 @@ export async function fetchResearchAblation() {
   return res.json();
 }
 
+export async function fetchRemittanceCountries() {
+  const res = await fetch(`${API_BASE}/remittance/countries`);
+  if (!res.ok) throw new Error('Failed to fetch remittance countries');
+  return res.json();
+}
+
 export async function fetchRemittanceCorridors() {
   const res = await fetch(`${API_BASE}/remittance/corridors`);
   if (!res.ok) throw new Error('Failed to fetch corridors');
@@ -47,6 +53,25 @@ export async function evaluateRemittance(data) {
     body: JSON.stringify(data)
   });
   if (!res.ok) throw new Error('Failed to evaluate remittance');
+  return res.json();
+}
+
+export async function executeRemittance(data) {
+  const res = await fetch(`${API_BASE}/remittance/execute`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to execute cross-border remittance');
+  }
+  return res.json();
+}
+
+export async function fetchRemittanceHistory() {
+  const res = await fetch(`${API_BASE}/remittance/history`);
+  if (!res.ok) throw new Error('Failed to fetch remittance history');
   return res.json();
 }
 

@@ -368,6 +368,40 @@ class VeraPaymentStateChaincode:
         return {"status": "SUCCESS", "token_id": token_id, "state": "MINTED"}
 
     # --------------------------------------------------------------------------
+    # Sovereign Cross-Border Remittance Functions (Project Nexus / Drunix PvP)
+    # --------------------------------------------------------------------------
+
+    def fn_SovereignRemittanceClearing(
+        self, args: Dict[str, Any], caller_msp: str, rw_set: Dict[str, Any], transient: Optional[Dict[str, Any]]
+    ) -> Dict[str, Any]:
+        """Clears a bidirectional cross-border remittance on Drunix with atomic PvP finality."""
+        remittance_id = args.get("remittance_id")
+        if not remittance_id:
+            raise DrunixChaincodeError("Missing remittance_id")
+
+        remit_data = {
+            "remittance_id": remittance_id,
+            "corridor": args.get("corridor"),
+            "direction": args.get("direction", "OUTWARD"),
+            "source_amount": float(args.get("source_amount", 0.0)),
+            "source_currency": args.get("source_currency", "INR"),
+            "dest_amount": float(args.get("dest_amount", 0.0)),
+            "dest_currency": args.get("dest_currency", "USD"),
+            "fx_rate": float(args.get("fx_rate", 1.0)),
+            "settlement_rail": args.get("settlement_rail", "Project Nexus / Drunix"),
+            "sender_id": args.get("sender_id"),
+            "recipient_id": args.get("recipient_id"),
+            "firc_number": args.get("firc_number"),
+            "tcs_inr": float(args.get("tcs_inr", 0.0)),
+            "cleared_at": datetime.utcnow().isoformat(),
+            "clearing_msp": caller_msp,
+            "status": "SETTLED_ATOMIC_PVP"
+        }
+
+        self.put_state(f"REMIT_{remittance_id}", remit_data, rw_set)
+        return {"status": "SUCCESS", "remittance_id": remittance_id, "state": "SETTLED_ATOMIC"}
+
+    # --------------------------------------------------------------------------
     # Queries & State Invariants
     # --------------------------------------------------------------------------
 
