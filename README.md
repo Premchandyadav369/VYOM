@@ -3,31 +3,46 @@
 ### The Intent Firewall for Digital Payments
 **Intent-Governed Payment State (IGPS) Architecture Powered by NPCI Drunix DLT**
 
+> 🏆 **Drunix Hackathon Submission (In collaboration with Citi & India Blockchain Forum)**  
+> **Challenge Code:** `CHL-7007` | **Track:** Build the Future of Payments in India | **Prize:** ₹175,000  
+> 📄 [**Read Hackathon Submission Dossier (HACKATHON_SUBMISSION.md)**](HACKATHON_SUBMISSION.md)  
+> ⏱ [**3-Minute Winning Demo Walkthrough Script (DEMO_SCRIPT.md)**](DEMO_SCRIPT.md)  
+> 📊 [**Championship Pitch Slides Outline (PITCH_SLIDES_OUTLINE.md)**](PITCH_SLIDES_OUTLINE.md)
+
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-[![NPCI Drunix](https://img.shields.io/badge/DLT-NPCI_Drunix_v1.0-emerald.svg)](https://github.com/npci/drunix)
+[![Hackathon](https://img.shields.io/badge/Drunix_Hackathon-Citi_%26_IBF-orange.svg)](https://indiablockchainforum.org)
+[![Challenge](https://img.shields.io/badge/Challenge-CHL--7007-purple.svg)](HACKATHON_SUBMISSION.md)
+[![NPCI Drunix](https://img.shields.io/badge/DLT-NPCI_Drunix_Raft-emerald.svg)](https://github.com/npci/drunix)
 [![Python](https://img.shields.io/badge/Python-3.11-blue.svg)](https://python.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-1.0-teal.svg)](https://fastapi.tiangolo.com)
-[![React](https://img.shields.io/badge/React-18.3-cyan.svg)](https://react.dev)
-[![Vite](https://img.shields.io/badge/Vite-6.4-purple.svg)](https://vitejs.dev)
-[![Tests](https://img.shields.io/badge/Tests-9%2F9%20Passing-brightgreen.svg)](tests/)
+[![Frontend](https://img.shields.io/badge/Frontend-Pure_HTML5%2FCSS%2FJS-yellow.svg)](static/)
+[![Tests](https://img.shields.io/badge/Tests-19%2F19%20Passing-brightgreen.svg)](tests/)
 
 ---
 
-## Table of Contents
+## 🎯 Quick Navigation for Hackathon Judges
 
-1. [Executive Summary & Problem Statement](#1-executive-summary--problem-statement)
-2. [The Core Innovation: Intent-Governed Payment State (IGPS)](#2-the-core-innovation-intent-governed-payment-state-igps)
-3. [End-to-End System Architecture](#3-end-to-end-system-architecture)
-4. [Dual-Engine Architecture: Intelligence + DLT](#4-dual-engine-architecture-intelligence--dlt)
-5. [Real-World Indian Payment Scam Protection Taxonomy](#5-real-world-indian-payment-scam-protection-taxonomy)
-6. [Interactive Studio & BYOD Data Features](#6-interactive-studio--byod-data-features)
-7. [Database Consistency & Ledger State Management](#7-database-consistency--ledger-state-management)
-8. [Scientific Research Benchmark & SFE Metric](#8-scientific-research-benchmark--sfe-metric)
-9. [Complete Step-by-Step Quickstart Guide](#9-complete-step-by-step-quickstart-guide)
-10. [Exhaustive API Reference (30+ Endpoints)](#10-exhaustive-api-reference-30-endpoints)
-11. [Design System & React Bits UI Components](#11-design-system--react-bits-ui-components)
-12. [Visionary Feature Roadmap](#12-visionary-feature-roadmap)
-13. [License & Citation](#13-license--citation)
+* 🌟 [**Executive Summary & Problem Statement**](#1-executive-summary--problem-statement)
+* 📋 [**Mapping to the 5 Hackathon Problem Statements**](#-mapping-to-the-5-hackathon-problem-statements)
+* 🛡️ [**Core Innovation: Intent-Governed Payment State (IGPS)**](#2-the-core-innovation-intent-governed-payment-state-igps)
+* 🏛️ [**End-to-End System & Drunix Topology**](#3-end-to-end-system-architecture)
+* ⚡ [**1-Click Judge Quickstart Guide**](#9-complete-step-by-step-quickstart-guide)
+* 🔬 [**Automated Verification Suite (19/19 Passing)**](#automated-verification-suite)
+* 📡 [**Exhaustive API Reference (50+ Endpoints)**](#10-exhaustive-api-reference-30-endpoints)
+
+---
+
+## 📋 Mapping to the 5 Hackathon Problem Statements
+
+VERA provides an end-to-end operational platform solving **all five challenge problem statements**:
+
+| # | Hackathon Problem Statement | VERA × Drunix Concrete Solution | Tested Live Endpoint / Code |
+|---|---|---|---|
+| **1** | **Real-Time Payments** | • Sub-50ms Intent Firewall prior to clearing<br>• ISO 20022 `pacs.008.001.08` XML wire inspector<br>• SHA-256 Merkle tree + Groth16 ZK intent proofs | `services/iso20022_service.py`<br>`services/crypto/merkle_zk.py`<br>`GET /payments/{id}/iso20022` |
+| **2** | **Real Asset Tokenization** | • TReDS trade receivables tokenization on Drunix<br>• ERC-3643 permissioned asset smart contracts<br>• Fractional liquidity & automated cashflow waterfall | `blockchain/chaincode/...py`<br>`POST /assets/tokenize`<br>`GET /assets` |
+| **3** | **Cross-Border Remittances** | • BIS Project Nexus instant clearing gateway<br>• Citi Nostro/Vostro multi-currency liquidity meters<br>• Sub-10ms automated RBI LRS limit & TCS calculation | `services/cbdc_nexus_service.py`<br>`POST /nexus/clear`<br>`GET /nexus/status` |
+| **4** | **Financial Inclusion** | • Programmable CBDC (e-Rupee) smart contract vouchers<br>• PM-KISAN Fertilizer voucher (MCC 5169 restricted)<br>• Ayushman Bharat health voucher (MCC 8062 restricted) | `blockchain/chaincode/...py`<br>`POST /cbdc/mint`<br>`POST /cbdc/redeem` |
+| **5** | **Innovative Fintech Ideas** | • Digital Arrest telecom & VoIP coercion forensics<br>• 2-of-3 threshold Quorum multi-sig override<br>• FIDO2/YubiKey WebAuthn hardware HSM attestation<br>• Drunix Byzantine Consensus Chaos Sandbox | `services/coercion_engine.py`<br>`services/quorum_service.py`<br>`services/chaos_engine.py`<br>`POST /security/hsm/verify` |
 
 ---
 
@@ -98,8 +113,9 @@ Drunix Commit & Settle         On-Chain Quarantine
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                          EDGE CLIENT & INGRESS TIER                         │
-│  • Web Dashboard (React 18 + Vite 6)      • Interactive Intent Studio       │
-│  • Statement Importer (BYOD CSV/JSON)     • Live UPI Simulator Stream       │
+│  • Pure Web Workstation (HTML5 + CSS Grid + Vanilla ES Modules)             │
+│  • Zero Node.js / Zero React Dependency — Instant Zero-Build Load           │
+│  • 1-Click Interactive Demo Scenarios • Statement Importer (BYOD CSV)      │
 └──────────────────────────────────────┬──────────────────────────────────────┘
                                        │ REST / JSON (Port 8000)
 ┌──────────────────────────────────────▼──────────────────────────────────────┐
@@ -321,91 +337,63 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2. Set Up Frontend Web Application
+### 2. Run Automated Test Suite (19/19 Tests Passing)
 ```bash
-cd apps/web
-npm install
-cd ../..
+python -m pytest tests/ -v
 ```
 
-### 3. Seed Demo Data & Initialize SQLite
+### 3. Launch VERA Workstation (Instant Zero-Build)
+VERA features a pure semantic HTML5 + CSS Grid + Vanilla ES Modules workstation served directly by the backend with **zero Node.js or npm dependencies**:
 ```bash
-python scripts/seed_demo.py
+python -m uvicorn apps.api.main:app --host 127.0.0.1 --port 8000 --reload
 ```
-
-### 4. Run Pytest Test Suite
-```bash
-pytest tests/ -v
-```
-
-### 5. Launch the Application
-
-#### Option A: Automated Launch Script
-```bash
-# On Linux/macOS:
-bash scripts/start.sh
-
-# On Windows PowerShell:
-python -m uvicorn apps.api.main:app --host 127.0.0.1 --port 8000
-# In a second terminal:
-cd apps/web
-npm run dev
-```
-
-#### Option B: Docker Compose
-```bash
-docker-compose up --build
-```
+Open **`http://127.0.0.1:8000`** in your browser.
 
 ---
 
-## 10. Exhaustive API Reference (30+ Endpoints)
+## 10. Exhaustive API Reference (50+ Endpoints)
 
 Interactive OpenAPI / Swagger documentation is available live at **`http://localhost:8000/docs`**.
 
-### Payments & Intent Governance
-- `POST /payments` — Initiate payment, evaluate multi-modal risk, commit to Drunix.
+### Problem 1: Real-Time Payments & Cryptographic Intent
+- `POST /payments` — Initiate payment, run sub-50ms intent evaluation, commit to Drunix.
 - `GET /payments` — List payments with pagination, status filters, and risk classes.
-- `GET /payments/{id}` — Payment Inspector: Full telemetry, state history, and Drunix transaction hash.
-- `POST /payments/{id}/verify` — Authorize secondary intent confirmation for `VERIFY_REQUIRED` payment.
-- `POST /payments/batch-import` — Ingest CSV/JSON payment records through VERA & Drunix in batch.
-- `POST /intent/analyze` — Real-time NLP intent consistency analysis for live input fields.
+- `GET /payments/{id}` — Full forensic payment telemetry, state history, and Drunix tx hash.
+- `POST /payments/{id}/verify` — Authorize secondary intent confirmation for `VERIFY_REQUIRED`.
+- `POST /payments/{id}/approve` — Release on-chain quarantine after dual-control verification.
+- `POST /payments/{id}/hold` — Force administrative quarantine and state lock on Drunix.
+- `GET /payments/{id}/iso20022` — Generate and inspect `pacs.008.001.08` XML wire message & hex dump.
+- `GET /payments/{id}/merkle-proof` — Fetch cryptographic SHA-256 Merkle inclusion proof ($O(\log N)$).
+- `GET /payments/{id}/zk-proof` — Generate and verify Groth16 zk-SNARK intent proof on BN254 curve.
+- `POST /statements/upload-csv` — Bulk ingest bank statement transactions with automatic scam triage.
 
-### Trust Graph
-- `GET /graph/network/{node_id}` — Get ego-network topology (supports `node_id=ALL` for full network).
-- `GET /graph/recipient/{id}` — Counterparty relationship metrics, PageRank centrality, and mule score.
-- `POST /graph/nodes` — Inject custom node or edge to test live graph isolation.
+### Problem 2: Real Asset Tokenization (TReDS Trade Finance)
+- `POST /assets/tokenize` — Tokenize institutional invoice receivable on Drunix ledger (ERC-3643).
+- `GET /assets` — List tokenized receivables, institutional credit rating, and yield tranches.
 
-### Policy Engine
-- `GET /policy/rules` — List active safety rules with severity and action.
-- `POST /policy/rules/{id}/toggle` — Toggle a policy rule ON or OFF.
+### Problem 3: Cross-Border Remittances (BIS Project Nexus)
+- `GET /nexus/status` — Inspect multilateral corridor health (India UPI $\leftrightarrow$ Singapore PayNow, UAE Jaywan).
+- `POST /nexus/clear` — Execute atomic cross-border settlement across Drunix connectors.
+- `GET /remittance/corridors` — List active currency corridors with Citi Nostro/Vostro liquidity meters.
+- `POST /remittance/evaluate` — Sub-10ms evaluation of RBI LRS annual limit ($250k) and TCS brackets.
 
-### Drunix Blockchain Explorer
-- `GET /drunix/network` — Network topology, block height, total transactions, and active MSPs.
-- `GET /drunix/blocks` — List recent blocks on the ledger.
-- `GET /drunix/block/{num}` — Get detailed block data, Merkle root, and orderer signature.
-- `GET /drunix/transactions` — List recent transactions with proposal hashes and RW sets.
-- `GET /drunix/transaction/{id}` — Get single transaction validation status and endorsement proofs.
+### Problem 4: Financial Inclusion & Programmable CBDC (e-Rupee)
+- `GET /cbdc/purposes` — List government welfare voucher purposes (PM-KISAN, Ayushman Bharat).
+- `GET /cbdc/tokens` — List minted purpose-bound e-Rupee tokens and redemption status.
+- `POST /cbdc/mint` — Mint e-Rupee token with cryptographically locked Merchant Category Code (MCC).
+- `POST /cbdc/redeem` — Execute on-chain redemption validated against authorized merchant MCC.
 
-### Cross-Border & Remittance
-- `GET /remittance/corridors` — List supported corridors (IN-SG, IN-UAE, IN-UK, IN-US).
-- `POST /remittance/evaluate` — Evaluate FX rates, route risk, and regulatory compliance.
-
-### Tokenized Assets
-- `POST /assets/tokenize` — Tokenize invoice receivable on Drunix.
-- `GET /assets` — List tokenized receivables and collateral status.
-
-### Simulation, Research & System
-- `GET /simulation/scenarios` — List interactive digital twin demo scenarios.
-- `POST /simulation/run-scenario` — Execute interactive scenario.
-- `GET /research/baselines` — Run benchmark comparison against baseline models.
-- `GET /research/ablation` — Run systematic ablation study across configurations A–H.
-- `GET /research/sfe-frontier` — Compute Safety-Friction Pareto Frontier curves.
-- `GET /research/hypotheses` — Evaluate scientific hypotheses H1–H6.
-- `GET /analytics/overview` — Get dynamic dashboard metrics computed from SQLite.
-- `GET /security/threat-model` — Return complete T1–T12 threat matrix.
-- `GET /security/audit-logs` — Tamper-evident hash-chained audit logs.
-- `POST /system/reset-demo` — Reseed SQLite database with fresh benchmark scenarios.
+### Problem 5: Innovative Fintech & Security Operations
+- `GET /payments/{id}/coercion` — Telecom forensics: active WhatsApp VoIP duration, AnyDesk/RAT detection.
+- `GET /payments/{id}/sar-report` — Generate print-ready FIU-IND Suspicious Transaction Report with SHA-256 seal.
+- `GET /payments/{id}/quorum-status` — 2-of-3 dual-control multi-sig threshold consensus status.
+- `POST /payments/{id}/quorum-approve` — Submit institutional quorum signature (Bank / NPCI / Compliance).
+- `POST /security/hsm/challenge` & `POST /security/hsm/verify` — FIDO2/YubiKey WebAuthn hardware token verification.
+- `GET /drunix/nodes` — Real-time health and Raft telemetry for 4 consortium peer nodes.
+- `GET /drunix/chaos/scenarios` — Catalog of Byzantine fault scenarios (Leader crash, 3/2 partition, MVCC double-spend).
+- `POST /drunix/chaos/inject` — Trigger live Byzantine fault injection to verify zero-loss consensus.
+- `POST /demo/inject-scenario` — 1-click live scenario injector (Digital Arrest, Mule Syndicate, Grocery, Nexus).
+- `GET /analytics/threat-heatmap` — Regional threat telemetry across Indian states (Maharashtra, Delhi, Karnataka).
 
 ---
 
