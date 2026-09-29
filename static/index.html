@@ -3,240 +3,42 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VERA × DRUNIX — Intent-Governed Payment Security</title>
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%232563eb'/><text x='50' y='68' font-size='50' font-weight='bold' text-anchor='middle' fill='white' font-family='monospace'>V</text></svg>">
+  <title>VERA — Payment Intent & Scam Defense Platform</title>
+
+  <!-- Modular CSS Architecture -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/typography.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/tables.css">
+  <link rel="stylesheet" href="css/workspace.css">
+  <link rel="stylesheet" href="css/graph.css">
+  <link rel="stylesheet" href="css/responsive.css">
+
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='4' fill='%23101318'/><text x='50' y='68' font-size='52' font-weight='bold' text-anchor='middle' fill='%234c8dff' font-family='monospace'>V</text></svg>">
 </head>
 <body>
 
-<div class="app-container">
-  <!-- Enterprise Sidebar -->
-  <aside class="sidebar">
-    <div class="sidebar-header">
-      <div class="brand-badge">V</div>
-      <div>
-        <div class="brand-title">VERA <span style="color:var(--color-brand); font-size:11px;">× DRUNIX</span></div>
-        <div class="brand-subtitle">Intent Firewall for Payments</div>
-      </div>
-    </div>
+<div class="app-shell">
+  <!-- Permanent Left Navigation (Section 10) -->
+  <aside class="app-sidebar" id="app-sidebar"></aside>
 
-    <nav class="sidebar-nav">
-      <div class="nav-group-label">SURVEILLANCE & TRIAGE</div>
-      <button class="nav-item active" data-view="overview">
-        <span><span class="nav-item-icon">⚡</span>Command Center</span>
-        <span class="nav-shortcut">⌘1</span>
-      </button>
-      <button class="nav-item" data-view="payments">
-        <span><span class="nav-item-icon">🛡</span>Transaction Monitor</span>
-        <span class="nav-shortcut">⌘2</span>
-      </button>
-      <button class="nav-item" data-view="rules">
-        <span><span class="nav-item-icon">⚖</span>Policy Rules</span>
-        <span class="nav-shortcut">⌘3</span>
-      </button>
+  <!-- Main Workstation View Area -->
+  <main class="app-main">
+    <!-- Topbar (Section 11) -->
+    <header class="topbar" id="app-topbar"></header>
 
-      <div class="nav-group-label" style="margin-top:10px;">DRUNIX INFRASTRUCTURE</div>
-      <button class="nav-item" data-view="blocks">
-        <span><span class="nav-item-icon">🧱</span>Block Explorer</span>
-        <span class="nav-shortcut">⌘4</span>
-      </button>
-      <button class="nav-item" data-view="simulation">
-        <span><span class="nav-item-icon">🧪</span>Scenario Simulation</span>
-        <span class="nav-shortcut">DEMO</span>
-      </button>
+    <!-- Content Workspace -->
+    <section class="workspace-content" id="view-container"></section>
 
-      <div class="nav-group-label" style="margin-top:10px;">PAYMENT CHANNELS & AUDIT</div>
-      <button class="nav-item" data-view="remittance">
-        <span><span class="nav-item-icon">🌐</span>Cross-Border Rails</span>
-      </button>
-      <button class="nav-item" data-view="security">
-        <span><span class="nav-item-icon">🔒</span>Security & Threat Matrix</span>
-      </button>
-    </nav>
-
-    <div class="sidebar-footer">
-      <button class="btn btn-secondary" onclick="toggleCommandPalette()" style="width:100%; margin-bottom:8px; font-size:10px; justify-content:space-between;">
-        <span>⌘ Search</span>
-        <span class="kbd-badge">⌘K</span>
-      </button>
-      <div class="consortium-box">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;">
-          <span style="color:#ffffff; font-weight:600;">Consortium Rail</span>
-          <span style="color:#10b981; display:flex; align-items:center; gap:4px;">
-            <span class="status-dot"></span> LIVE
-          </span>
-        </div>
-        <div>NPCI Drunix v1.0.0</div>
-      </div>
-    </div>
-  </aside>
-
-  <!-- Main Workspace -->
-  <div class="main-wrapper">
-    <!-- Topbar -->
-    <header class="topbar">
-      <div class="breadcrumb">
-        <span style="color:var(--text-muted);">VERA</span>
-        <span class="breadcrumb-sep">/</span>
-        <span style="color:var(--text-secondary);">payments-channel</span>
-        <span class="breadcrumb-sep">/</span>
-        <span class="breadcrumb-active" id="current-breadcrumb-title">Operations Command Center</span>
-      </div>
-
-      <button class="search-trigger-btn" onclick="toggleCommandPalette()">
-        <span>Search transaction ID, VPA, or command...</span>
-        <span class="kbd-badge">⌘K</span>
-      </button>
-
-      <div class="topbar-status">
-        <div class="pill-badge active-sim">
-          <span>DRUNIX: <strong>SIMULATOR</strong></span>
-        </div>
-        <div class="pill-badge">
-          <span>BLOCK: <strong style="color:#ffffff;" id="topbar-block-num">#34</strong></span>
-        </div>
-        <div style="display:flex; align-items:center; gap:6px; color:#10b981;">
-          <span class="status-dot"></span>
-          <span>CONSENSUS ACTIVE</span>
-        </div>
-        <div style="padding-left:8px; border-left:1px solid var(--border-subtle); display:flex; align-items:center; gap:6px;">
-          <div style="width:22px; height:22px; border-radius:50%; background:#1c2438; border:1px solid #2d3a5a; display:flex; align-items:center; justify-content:center; color:#93c5fd; font-weight:700; font-size:10px;">
-            OP
-          </div>
-          <div style="font-size:10px; line-height:1.1;">
-            <div style="color:#ffffff; font-weight:600;">Ops Lead</div>
-            <div class="text-muted" style="font-size:9px;">Tier-3 SOC</div>
-          </div>
-        </div>
-      </div>
-    </header>
-
-    <!-- Dynamic Content Area -->
-    <main class="content-area" id="view-container">
-      <!-- Injected dynamically by app.js -->
-    </main>
-  </div>
+    <!-- Persistent Bottom Status Strip (Section 25) -->
+    <footer class="bottom-statusbar" id="app-statusbar"></footer>
+  </main>
 </div>
 
-<!-- Persistent Bottom Telemetry Status Bar -->
-<footer class="bottom-statusbar">
-  <div class="status-left">
-    <div style="display:flex; align-items:center; gap:6px; color:#10b981;">
-      <span class="status-dot"></span>
-      <span style="color:#ffffff; font-weight:600;">DRUNIX DLT:</span>
-      <span style="color:#34d399;">CONSORTIUM SIMULATOR (RAFT CONSENSUS)</span>
-    </div>
-    <span class="status-divider">|</span>
-    <div>
-      <span>HEAD BLOCK:</span>
-      <strong style="color:#ffffff;" id="bottom-block-num">#34</strong>
-    </div>
-    <span class="status-divider">|</span>
-    <div>
-      <span>STATE DB:</span>
-      <span style="color:#cbd5e1;">SQLite ACID</span>
-    </div>
-    <span class="status-divider">|</span>
-    <div>
-      <span>INTENT ENGINE:</span>
-      <span style="color:#93c5fd;">Dual-Track v1.4</span>
-    </div>
-  </div>
+<!-- Modular Vanilla JavaScript Entry Point -->
+<script type="module" src="js/app.js"></script>
 
-  <div class="status-right">
-    <div>
-      <span>P99:</span>
-      <strong style="color:#ffffff;">28ms</strong>
-    </div>
-    <span class="status-divider">|</span>
-    <div id="bottom-clock" style="color:#9ca3af;">08:50:00 IST (UTC)</div>
-  </div>
-</footer>
-
-<!-- Modals -->
-
-<!-- 1. New Intent Payment Modal -->
-<div class="modal-overlay" id="modal-new-payment" style="display:none;" onclick="if(event.target === this) closeNewPaymentModal();">
-  <div class="modal-box">
-    <div class="modal-header">
-      <span>Initiate New Intent-Governed Payment</span>
-      <button class="btn btn-secondary text-xs" onclick="closeNewPaymentModal()">✕</button>
-    </div>
-    <div class="modal-body">
-      <form onsubmit="submitNewPayment(event)">
-        <div class="form-group">
-          <label class="form-label">Sender UPI Handle</label>
-          <input type="text" id="new-sender" class="form-input" value="rohit.sharma@okaxis" required />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Beneficiary Handle / Account</label>
-          <input type="text" id="new-recipient" class="form-input" value="blinkit@axisbank" required />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Amount (INR)</label>
-          <input type="number" id="new-amount" class="form-input" value="1450" required />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Transaction Category</label>
-          <select id="new-category" class="form-select">
-            <option value="merchant_order">Merchant Purchase (Standard)</option>
-            <option value="p2p_transfer">Peer-to-Peer Transfer</option>
-            <option value="utility_bill">Electricity / Water / Internet Bill</option>
-            <option value="courier_customs_fine">Customs / Courier Clearance Fee</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Stated Intent (Natural Language Narrative)</label>
-          <textarea id="new-intent" class="form-textarea" rows="2" placeholder="e.g. Weekly grocery order delivered to home">Weekly grocery supplies delivery</textarea>
-        </div>
-        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px;">
-          <button type="button" class="btn btn-secondary" onclick="closeNewPaymentModal()">Cancel</button>
-          <button type="submit" class="btn btn-primary">Submit to VERA & Drunix</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-<!-- 2. Statement CSV Import Modal -->
-<div class="modal-overlay" id="modal-csv" style="display:none;" onclick="if(event.target === this) closeCSVModal();">
-  <div class="modal-box">
-    <div class="modal-header">
-      <span>Batch Import Bank Statement (CSV / BYOD)</span>
-      <button class="btn btn-secondary text-xs" onclick="closeCSVModal()">✕</button>
-    </div>
-    <div class="modal-body">
-      <p class="text-xs text-secondary" style="margin-bottom:12px;">
-        Ingest historical bank statements for instantaneous intent consistency evaluation and Drunix ledger anchorage.
-      </p>
-      <div style="background:var(--bg-elevated); padding:10px; border-radius:6px; border:1px solid var(--border-subtle); margin-bottom:14px; font-family:var(--font-mono); font-size:10px; color:#cbd5e1;">
-        <div>Sample records loaded:</div>
-        <div>• rohit.sharma@okaxis ➔ blinkit@axisbank | ₹1,450 (Weekly grocery delivery)</div>
-        <div>• ananya.sen@sbi ➔ delhi-customs-hold@ybl | ₹48,000 (Urgent customs clearance)</div>
-        <div>• deepak.verma@okhdfcbank ➔ tatapower@icici | ₹2,840 (Monthly electricity bill)</div>
-      </div>
-      <div style="display:flex; justify-content:flex-end; gap:8px;">
-        <button type="button" class="btn btn-secondary" onclick="closeCSVModal()">Cancel</button>
-        <button type="button" class="btn btn-allow" onclick="submitCSVImport()">Process & Import Statement</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- 3. Command Palette Modal (⌘K) -->
-<div class="modal-overlay" id="modal-command-palette" style="display:none;" onclick="if(event.target === this) closeCommandPalette();">
-  <div class="cmd-palette-box">
-    <input type="text" id="cmd-palette-input" class="cmd-input" placeholder="Type a destination, transaction ID, or command..." autocomplete="off" />
-    <div class="cmd-list" id="cmd-palette-list">
-      <!-- Populated dynamically -->
-    </div>
-    <div style="padding:8px 14px; border-top:1px solid var(--border-subtle); background:#06070a; display:flex; justify-content:space-between; font-family:var(--font-mono); font-size:10px; color:var(--text-muted);">
-      <div><span class="kbd-badge">ESC</span> to close</div>
-      <div>VERA Operational Command</div>
-    </div>
-  </div>
-</div>
-
-<script src="js/app.js"></script>
 </body>
 </html>

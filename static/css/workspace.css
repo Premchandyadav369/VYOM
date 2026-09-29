@@ -1,0 +1,151 @@
+/* Split Screen & Investigation Workspace */
+
+.workspace-split {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  height: 100%;
+}
+
+.workspace-table-pane {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Right-Side Investigation Drawer */
+.investigation-drawer {
+  width: 380px;
+  flex-shrink: 0;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.drawer-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 8px;
+}
+
+.drawer-section-title {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+}
+
+.drawer-keyvalue-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3px 0;
+}
+
+.drawer-key {
+  color: var(--text-muted);
+}
+
+.drawer-val {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.intent-box {
+  background-color: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px;
+  font-size: 11px;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+/* Horizontal Risk Decomposition Bars */
+.risk-breakdown-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 5px;
+}
+
+.risk-breakdown-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+  width: 140px;
+  flex-shrink: 0;
+}
+
+.risk-breakdown-bar {
+  flex: 1;
+  height: 5px;
+  background-color: var(--surface-3);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.risk-breakdown-fill {
+  height: 100%;
+}
+
+.risk-breakdown-num {
+  width: 35px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+
+/* Drunix State Sequence */
+.drunix-stepper {
+  display: flex;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.drunix-stepper-item {
+  flex: 1;
+  padding: 3px;
+  text-align: center;
+  font-size: 8px;
+  font-family: var(--font-mono);
+  background-color: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  border-radius: 1px;
+}
+
+.drunix-stepper-item.done {
+  background-color: var(--blue-subtle);
+  border-color: #264375;
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* Dedicated Investigation Layout */
+.investigation-grid {
+  display: grid;
+  grid-template-columns: 300px 1fr 320px;
+  gap: 12px;
+  height: calc(100vh - var(--topbar-h) - var(--statusbar-h) - 40px);
+}
+
+.investigation-pane {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}

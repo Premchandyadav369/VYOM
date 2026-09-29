@@ -1,0 +1,41 @@
+/* Responsive Behaviors */
+
+@media (max-width: 1024px) {
+  .investigation-grid {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+
+  .workspace-split {
+    flex-direction: column;
+  }
+
+  .investigation-drawer {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-sidebar {
+    position: fixed;
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+    z-index: 50;
+  }
+
+  .app-sidebar.mobile-open {
+    transform: translateX(0);
+  }
+
+  .app-main {
+    margin-left: 0;
+  }
+
+  .stat-strip {
+    flex-wrap: wrap;
+  }
+
+  .stat-box {
+    flex: 1 1 calc(50% - 6px);
+  }
+}
