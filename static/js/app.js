@@ -1,5 +1,5 @@
 /**
- * VERA Master Application Entry Point
+ * VYOM Master Application Entry Point
  * Pure Vanilla JavaScript Client - Zero Node / Zero Framework Dependency
  * Connected to Real-Time WebSocket Telemetry Stream
  */
@@ -28,7 +28,7 @@ import { renderResearch } from './views/research.js';
 import { renderSecurity } from './views/security.js';
 
 // Global helper for opening payment inspection from any view
-window.veraSelectPayment = function(paymentId) {
+window.vyomSelectPayment = window.veraSelectPayment = function(paymentId) {
   const p = state.payments.find(x => x.payment_id === paymentId);
   if (p) {
     state.setSelectedPayment(p);
@@ -191,7 +191,7 @@ async function init() {
       if (match) state.selectedPayment = match;
     }
   } catch (err) {
-    console.error('Failed to load initial VERA data:', err);
+    console.error('Failed to load initial VYOM data:', err);
   }
 
   // Render Shell

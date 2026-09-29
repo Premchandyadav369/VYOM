@@ -18,7 +18,7 @@ export function setupCommandPalette() {
         <div id="cmd-search-results" class="cmd-results"></div>
         <div style="padding:6px 12px; background:var(--surface-2); border-top:1px solid var(--border); font-family:var(--font-mono); font-size:10px; color:var(--text-dim); display:flex; justify-content:space-between;">
           <span>Esc to close</span>
-          <span>VERA Command Terminal</span>
+          <span class="text-[#ef233c] font-bold">VYOM Command Terminal</span>
         </div>
       </div>
     `;

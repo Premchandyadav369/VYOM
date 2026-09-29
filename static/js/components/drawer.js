@@ -48,13 +48,31 @@ export function renderInvestigationDrawer(payment, onClose) {
       </div>
 
       <!-- Navigation Tabs -->
-      <div class="tabs-header" style="flex-shrink:0;">
-        <button class="tab-btn ${activeDrawerTab === 'triage' ? 'active' : ''}" data-tab="triage">Triage</button>
-        <button class="tab-btn ${activeDrawerTab === 'iso' ? 'active' : ''}" data-tab="iso">ISO 20022</button>
-        <button class="tab-btn ${activeDrawerTab === 'merkle' ? 'active' : ''}" data-tab="merkle">Merkle & ZK</button>
-        <button class="tab-btn ${activeDrawerTab === 'coercion' ? 'active' : ''}" data-tab="coercion">Coercion</button>
-        <button class="tab-btn ${activeDrawerTab === 'sar' ? 'active' : ''}" data-tab="sar">FIU SAR</button>
-        <button class="tab-btn ${activeDrawerTab === 'quorum' ? 'active' : ''}" data-tab="quorum">Quorum</button>
+      <div class="tabs-header flex gap-1 p-1 bg-black/40 rounded-lg border border-white/5" style="flex-shrink:0;">
+        <button class="tab-btn flex items-center gap-1.5 px-2.5 py-1 rounded text-[10.5px] font-mono ${activeDrawerTab === 'triage' ? 'active' : ''}" data-tab="triage">
+          <iconify-icon icon="lucide:shield-alert" class="w-3.5 h-3.5"></iconify-icon>
+          <span>Triage</span>
+        </button>
+        <button class="tab-btn flex items-center gap-1.5 px-2.5 py-1 rounded text-[10.5px] font-mono ${activeDrawerTab === 'iso' ? 'active' : ''}" data-tab="iso">
+          <iconify-icon icon="lucide:file-code" class="w-3.5 h-3.5"></iconify-icon>
+          <span>ISO 20022</span>
+        </button>
+        <button class="tab-btn flex items-center gap-1.5 px-2.5 py-1 rounded text-[10.5px] font-mono ${activeDrawerTab === 'merkle' ? 'active' : ''}" data-tab="merkle">
+          <iconify-icon icon="lucide:lock" class="w-3.5 h-3.5"></iconify-icon>
+          <span>Merkle & ZK</span>
+        </button>
+        <button class="tab-btn flex items-center gap-1.5 px-2.5 py-1 rounded text-[10.5px] font-mono ${activeDrawerTab === 'coercion' ? 'active' : ''}" data-tab="coercion">
+          <iconify-icon icon="lucide:phone-call" class="w-3.5 h-3.5"></iconify-icon>
+          <span>Coercion</span>
+        </button>
+        <button class="tab-btn flex items-center gap-1.5 px-2.5 py-1 rounded text-[10.5px] font-mono ${activeDrawerTab === 'sar' ? 'active' : ''}" data-tab="sar">
+          <iconify-icon icon="lucide:file-text" class="w-3.5 h-3.5"></iconify-icon>
+          <span>FIU SAR</span>
+        </button>
+        <button class="tab-btn flex items-center gap-1.5 px-2.5 py-1 rounded text-[10.5px] font-mono ${activeDrawerTab === 'quorum' ? 'active' : ''}" data-tab="quorum">
+          <iconify-icon icon="lucide:key" class="w-3.5 h-3.5"></iconify-icon>
+          <span>Quorum</span>
+        </button>
       </div>
 
       <!-- Scrollable Tab Content Container -->

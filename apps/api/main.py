@@ -92,9 +92,9 @@ def broadcast_event(event_type: str, data: dict):
 
 
 app = FastAPI(
-    title="VERA x DRUNIX Core API",
+    title="VYOM x DRUNIX Core API",
     description="Intent-Governed Payment Infrastructure (IGPS) powered by NPCI Drunix Distributed Ledger",
-    version="1.0.0"
+    version="2.0.0"
 )
 
 # CORS configuration
@@ -123,7 +123,7 @@ def serve_index():
     index_path = os.path.join(_static_dir, "index.html")
     if os.path.exists(index_path):
         return FileResponse(index_path)
-    return {"status": "ONLINE", "service": "VERA x DRUNIX Core API"}
+    return {"status": "ONLINE", "service": "VYOM x DRUNIX Core API"}
 
 @app.get("/health", tags=["System"])
 @app.get("/api/v1/health", tags=["System"])
@@ -138,8 +138,8 @@ def health_check(db: Session = Depends(get_db)):
     
     return {
         "status": "HEALTHY",
-        "service": "VERA x DRUNIX Intent Firewall",
-        "version": "1.0.0",
+        "service": "VYOM x DRUNIX Intent Firewall",
+        "version": "2.0.0",
         "timestamp": datetime.utcnow().isoformat(),
         "database": db_status,
         "payment_records_indexed": payment_count,

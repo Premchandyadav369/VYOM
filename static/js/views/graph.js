@@ -23,7 +23,7 @@ export function renderGraph(container) {
     { title: 'T+2h: Synthetic Account Registration', desc: 'New unverified device registers handle customs.clearance.hold@scam.', activeNodes: ['usr', 'dev', 'tx1', 'rcp'], alert: 'NEW_UNVERIFIED_VPA' },
     { title: 'T+6h: Smurfing Ingestion Phase', desc: 'Rapid velocity burst: 4 disparate senders route funds into mule account.', activeNodes: ['usr', 'dev', 'tx1', 'rcp', 'mule1'], alert: 'FAN_IN_VELOCITY_SPIKE' },
     { title: 'T+24h: Peeling Chain & Layering', desc: 'Funds peeled across 3 intermediary layer accounts to evade standard AML thresholds.', activeNodes: ['usr', 'dev', 'tx1', 'rcp', 'mule1', 'mule2', 'layer'], alert: 'PEELING_CHAIN_DETECTED' },
-    { title: 'T+72h: Syndicate Consolidation & Quarantine', desc: 'Consolidation attempt to offshore exit wallet. VERA triggers Drunix cryptographic freeze.', activeNodes: ['usr', 'dev', 'tx1', 'rcp', 'mule1', 'mule2', 'layer', 'exit'], alert: 'SYNDICATE_FREEZE_ANCHORED' }
+    { title: 'T+72h: Syndicate Consolidation & Quarantine', desc: 'Consolidation attempt to offshore exit wallet. VYOM triggers Drunix cryptographic freeze.', activeNodes: ['usr', 'dev', 'tx1', 'rcp', 'mule1', 'mule2', 'layer', 'exit'], alert: 'SYNDICATE_FREEZE_ANCHORED' }
   ];
 
   function updateInspector(node) {

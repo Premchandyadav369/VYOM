@@ -1,4 +1,4 @@
-# VERA × DRUNIX
+# VYOM × DRUNIX
 
 ### The Intent Firewall for Digital Payments
 **Intent-Governed Payment State (IGPS) Architecture Powered by NPCI Drunix DLT**
@@ -34,9 +34,9 @@
 
 ## 📋 Mapping to the 5 Hackathon Problem Statements
 
-VERA provides an end-to-end operational platform solving **all five challenge problem statements**:
+VYOM provides an end-to-end operational platform solving **all five challenge problem statements**:
 
-| # | Hackathon Problem Statement | VERA × Drunix Concrete Solution | Tested Live Endpoint / Code |
+| # | Hackathon Problem Statement | VYOM × Drunix Concrete Solution | Tested Live Endpoint / Code |
 |---|---|---|---|
 | **1** | **Real-Time Payments** | • Sub-50ms Intent Firewall prior to clearing<br>• ISO 20022 `pacs.008.001.08` XML wire inspector<br>• SHA-256 Merkle tree + Groth16 ZK intent proofs | `services/iso20022_service.py`<br>`services/crypto/merkle_zk.py`<br>`GET /payments/{id}/iso20022` |
 | **2** | **Real Asset Tokenization** | • TReDS trade receivables tokenization on Drunix<br>• ERC-3643 permissioned asset smart contracts<br>• Fractional liquidity & automated cashflow waterfall | `blockchain/chaincode/...py`<br>`POST /assets/tokenize`<br>`GET /assets` |
@@ -65,15 +65,15 @@ Yet, over **85% of catastrophic consumer payment losses** in India are **authori
 In all these scenarios:
 $$\text{Authentication} = \text{Valid}, \quad \text{Consent} = \text{Coerced}, \quad \text{Harm} = \text{Catastrophic}$$
 
-**VERA × DRUNIX solves this fundamental gap.**
-* **VERA** evaluates whether a payment is consistent with true user intent, context, and counterparty relationships.
+**VYOM × DRUNIX solves this fundamental gap.**
+* **VYOM** evaluates whether a payment is consistent with true user intent, context, and counterparty relationships.
 * **DRUNIX** (NPCI's permissioned DLT) enforces the resulting policy on-chain, preventing irrevocable settlement of coerced transactions across participating banks and PSPs.
 
 ---
 
 ## 2. The Core Innovation: Intent-Governed Payment State (IGPS)
 
-VERA introduces **Intent-Governed Payment State (IGPS)**, a payment state machine where money transfers move through verifiable, policy-governed stages rather than atomic debit instructions:
+VYOM introduces **Intent-Governed Payment State (IGPS)**, a payment state machine where money transfers move through verifiable, policy-governed stages rather than atomic debit instructions:
 
 ```
 [ PAYMENT_CREATED ]
@@ -119,7 +119,7 @@ Drunix Commit & Settle         On-Chain Quarantine
 └──────────────────────────────────────┬──────────────────────────────────────┘
                                        │ REST / JSON (Port 8000)
 ┌──────────────────────────────────────▼──────────────────────────────────────┐
-│                    VERA MULTI-MODAL INTELLIGENCE ENGINE                     │
+│                    VYOM MULTI-MODAL INTELLIGENCE ENGINE                     │
 │                                                                             │
 │   ┌────────────────────┐ ┌────────────────────┐ ┌────────────────────────┐  │
 │   │   Intent Engine    │ │ Behavioral Engine  │ │   Trust Graph Engine   │  │
@@ -156,7 +156,7 @@ Drunix Commit & Settle         On-Chain Quarantine
                                      │ Persistent State Synchronization
 ┌────────────────────────────────────▼────────────────────────────────────────┐
 │                        PERSISTENT RELATIONAL STORAGE                        │
-│  • SQLite (`vera_storage.db`) / PostgreSQL (Production)                     │
+│  • SQLite (`vyom_storage.db`) / PostgreSQL (Production)                     │
 │  • Payments • Blocks • Transactions • Tokenized Assets • Tamper-Evident Logs │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -165,7 +165,7 @@ Drunix Commit & Settle         On-Chain Quarantine
 
 ## 4. Dual-Engine Architecture: Intelligence + DLT
 
-### Engine 1: VERA Probabilistic Intelligence
+### Engine 1: VYOM Probabilistic Intelligence
 1. **NLP Intent Engine (`services/intent_engine/`):**
    - Extracts semantic embeddings from stated transfer narratives and compares them against counterparty merchant classifications.
    - Real-time token matching for high-pressure extortion cues (`police`, `customs`, `cbi`, `arrest`, `warrant`, `urgent`, `narcotics`).
@@ -188,11 +188,11 @@ Drunix Commit & Settle         On-Chain Quarantine
 
 ## 5. Real-World Indian Payment Scam Protection Taxonomy
 
-VERA includes built-in detection models calibrated for India's most prevalent payment frauds:
+VYOM includes built-in detection models calibrated for India's most prevalent payment frauds:
 
 ```
 ┌────────────────────────────┬──────────────────────────────────┬───────────────────────┐
-│ Attack Vector              │ Modus Operandi                   │ VERA × DRUNIX Action  │
+│ Attack Vector              │ Modus Operandi                   │ VYOM × DRUNIX Action  │
 ├────────────────────────────┼──────────────────────────────────┼───────────────────────┤
 │ Digital Arrest (CBI Scam)  │ Fake police video interrogation  │ Coercion token match  │
 │                            │ demanding escrow bail bond       │ + HOLD (4-Hour Lock)  │
@@ -215,7 +215,7 @@ VERA includes built-in detection models calibrated for India's most prevalent pa
 
 ## 6. Interactive Studio & BYOD Data Features
 
-To eliminate static placeholder mockups, VERA provides **four live interactive workbenches**:
+To eliminate static placeholder mockups, VYOM provides **four live interactive workbenches**:
 
 ### 1. Interactive Live Intent Terminal (`LivePaymentModal.tsx`)
 - Input any custom sender UPI VPA, beneficiary VPA, amount, category, and natural language narrative.
@@ -231,7 +231,7 @@ To eliminate static placeholder mockups, VERA provides **four live interactive w
 ### 3. Force-Directed Trust Graph Sandbox (`TrustGraph.tsx`)
 - Interactive canvas with zoom, pan, and draggable nodes.
 - Color-coded node halos (Green = Verified Merchant, Blue = Regular User, Red = Flagged Mule Hub).
-- **Injection Drawer**: Inject new nodes and transfer edges dynamically to observe how VERA isolates mule networks in real time.
+- **Injection Drawer**: Inject new nodes and transfer edges dynamically to observe how VYOM isolates mule networks in real time.
 
 ### 4. Custom Policy Rules Sandbox (`PolicyRulesModal.tsx`)
 - Toggle live rules ON/OFF (e.g. Authority Impersonation Intercept, Mule Quarantine, Screen Sharing Lockdown).
@@ -241,7 +241,7 @@ To eliminate static placeholder mockups, VERA provides **four live interactive w
 
 ## 7. Database Consistency & Ledger State Management
 
-VERA enforces strict **ACID and distributed ledger consistency** across SQLite (`vera_storage.db`) and Drunix state:
+VYOM enforces strict **ACID and distributed ledger consistency** across SQLite (`vyom_storage.db`) and Drunix state:
 
 ```sql
 -- Core Table Schema Summary
@@ -295,7 +295,7 @@ drunix_transactions (
 ## 8. Scientific Research Benchmark & SFE Metric
 
 ### The Safety-Friction Efficiency (SFE) Metric
-Traditional fraud systems optimize for Precision and Recall independently. VERA optimizes for **Safety-Friction Efficiency (SFE)**:
+Traditional fraud systems optimize for Precision and Recall independently. VYOM optimizes for **Safety-Friction Efficiency (SFE)**:
 
 $$\text{SFE} = \frac{\Delta \text{Harm Blocked (INR)}}{\Delta \text{Legitimate User Friction (Tx Count)}}$$
 
@@ -308,7 +308,7 @@ $$\text{SFE} = \frac{\Delta \text{Harm Blocked (INR)}}{\Delta \text{Legitimate U
 | Isolation Forest | 0.620 | 0.801 | 68.0% | 51.5% | 14.1 ms | 1.95x |
 | XGBoost Ensemble | 0.785 | 0.892 | 81.2% | 72.4% | 22.4 ms | 2.80x |
 | Graph GCN (EgoNet) | 0.810 | 0.915 | 86.4% | 74.0% | 31.2 ms | 3.15x |
-| **VERA × DRUNIX (IGPS)** | **0.942** | **0.984** | **98.4%** | **96.8%** | **38.0 ms** | **4.80x** |
+| **VYOM × DRUNIX (IGPS)** | **0.942** | **0.984** | **98.4%** | **96.8%** | **38.0 ms** | **4.80x** |
 
 *Full technical research paper available in [`research/paper/`](research/paper/paper.md).*
 
@@ -342,8 +342,8 @@ pip install -r requirements.txt
 python -m pytest tests/ -v
 ```
 
-### 3. Launch VERA Workstation (Instant Zero-Build)
-VERA features a pure semantic HTML5 + CSS Grid + Vanilla ES Modules workstation served directly by the backend with **zero Node.js or npm dependencies**:
+### 3. Launch VYOM Workstation (Instant Zero-Build)
+VYOM features a pure semantic HTML5 + CSS Grid + Vanilla ES Modules workstation served directly by the backend with **zero Node.js or npm dependencies**:
 ```bash
 python -m uvicorn apps.api.main:app --host 127.0.0.1 --port 8000 --reload
 ```
@@ -416,7 +416,7 @@ The web application is styled with an **Apple / Linear fintech dark aesthetic** 
 
 ## 12. Visionary Feature Roadmap
 
-To advance the VERA × DRUNIX paradigm into an industry-standard production infrastructure, the following extensions are architected:
+To advance the VYOM × DRUNIX paradigm into an industry-standard production infrastructure, the following extensions are architected:
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -441,7 +441,7 @@ To advance the VERA × DRUNIX paradigm into an industry-standard production infr
 ├─────────────────────────────────────────────────────────────────────────────┤
 │ 5. WhatsApp & Telegram QR Pre-Screening Webhook Bot                         │
 │    • Allows users to forward suspect payment QR codes or VPAs to a bot      │
-│      that queries VERA's trust graph before the UPI app is opened.          │
+│      that queries VYOM's trust graph before the UPI app is opened.          │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │ 6. Automated Dispute & On-Chain Reversal Arbitration DAO                    │
 │    • Decentralized dispute escrow allowing 1-click clawback of funds held    │
@@ -455,12 +455,12 @@ To advance the VERA × DRUNIX paradigm into an industry-standard production infr
 
 Licensed under the **Apache License, Version 2.0**.
 
-If you use VERA or Drunix in academic or industrial research, please cite:
+If you use VYOM or Drunix in academic or industrial research, please cite:
 
 ```bibtex
-@article{vera_drunix_2026,
-  title={VERA: Intent-Governed Payment State Architecture for Coercion Resilience on Distributed Ledgers},
-  author={Yadav, Premchand and VERA Consortium Research Team},
+@article{vyom_drunix_2026,
+  title={VYOM: Intent-Governed Payment State Architecture for Coercion Resilience on Distributed Ledgers},
+  author={Yadav, Premchand and VYOM Consortium Research Team},
   journal={Fintech Systems & Distributed Ledger Technologies},
   year={2026},
   url={https://github.com/Premchandyadav369/VYOM}

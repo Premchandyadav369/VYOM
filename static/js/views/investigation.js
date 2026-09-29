@@ -147,7 +147,7 @@ export function renderInvestigation(container) {
 
         <div class="drawer-section-title">CRYPTOGRAPHIC ATTESTATION</div>
         <div class="text-meta" style="word-break:break-all; font-size:9px; color:var(--text-dim);">
-          ${p.risk_details?.vera_signature || 'SIG_ECDSA_SHA256_VERA_D481C9A'}
+          ${p.risk_details?.vyom_signature || p.risk_details?.vera_signature || 'SIG_ECDSA_SHA256_VYOM_D481C9A'}
         </div>
       </div>
     </div>

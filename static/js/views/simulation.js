@@ -72,7 +72,7 @@ export function renderSimulation(container) {
       'Generating synthetic users (Seed 42)...',
       'Generating transaction baseline distribution...',
       'Injecting adversarial scam scenario vectors...',
-      'Executing VERA intent & multi-modal evaluation pipeline...',
+      'Executing VYOM intent & multi-modal evaluation pipeline...',
       'Submitting risk decisions to Drunix consensus peers...',
       'Evaluating false positive and false negative detection metrics...'
     ];

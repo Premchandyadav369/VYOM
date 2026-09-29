@@ -1,6 +1,6 @@
 # HACKATHON SUBMISSION DOSSIER
 
-# VERA — The Intent Firewall for Digital Payments
+# VYOM — The Intent Firewall for Digital Payments
 ### Intent-Governed Payment State (IGPS) Architecture Powered by NPCI Drunix Distributed Ledger Technology
 
 ---
@@ -38,8 +38,8 @@ Because of this assumption, **over 85% of catastrophic consumer and institutiona
 4. **MSME Credit Gaps:** Over ₹30 Lakh Crore trapped in unpaid trade invoices due to slow TReDS reconciliation and double-financing vulnerabilities.
 5. **Subsidy Diversion:** Rural direct benefit transfers (DBT) diverted from essential agricultural and healthcare purposes.
 
-### The Solution: VERA × DRUNIX
-**VERA** is an **Intent-Governed Payment State (IGPS)** platform. It sits directly between the payment application interface (UPI/PSP/Core Banking) and the **NPCI Drunix Distributed Ledger**. Instead of atomic, blind debits, every payment undergoes real-time multi-modal intent evaluation, telecom coercion forensics, and cryptographic validation before entering Drunix consensus.
+### The Solution: VYOM × DRUNIX
+**VYOM** is an **Intent-Governed Payment State (IGPS)** platform. It sits directly between the payment application interface (UPI/PSP/Core Banking) and the **NPCI Drunix Distributed Ledger**. Instead of atomic, blind debits, every payment undergoes real-time multi-modal intent evaluation, telecom coercion forensics, and cryptographic validation before entering Drunix consensus.
 
 ```
        [ USER / MSME / CITIZEN ]
@@ -50,7 +50,7 @@ Because of this assumption, **over 85% of catastrophic consumer and institutiona
                    │
                    ▼
   ┌─────────────────────────────────────────────────────────┐
-  │         VERA INTENT FIREWALL (Sub-50ms Gateway)         │
+  │         VYOM INTENT FIREWALL (Sub-50ms Gateway)         │
   │  • NLP Semantic Intent Vectorization (Cosine vs Payee)  │
   │  • Digital Arrest Forensics (Active VoIP, Screen Share) │
   │  • Behavioral Outlier & Ego-Network PageRank Scoring    │
@@ -71,13 +71,13 @@ Because of this assumption, **over 85% of catastrophic consumer and institutiona
 
 ## 2. Direct Mapping to the 5 Hackathon Problem Statements
 
-VERA was architected to address **all five problem statements** set forth in Challenge **CHL-7007**, providing concrete implementations, smart contracts, and real-time APIs for each:
+VYOM was architected to address **all five problem statements** set forth in Challenge **CHL-7007**, providing concrete implementations, smart contracts, and real-time APIs for each:
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
 │                        CHL-7007 FIVE PROBLEM STATEMENTS MAPPING                        │
 ├────────────────────────┬─────────────────────────────┬─────────────────────────────────┤
-│ Problem Statement      │ VERA x Drunix Solution      │ Core File / Live Endpoint       │
+│ Problem Statement      │ VYOM x Drunix Solution      │ Core File / Live Endpoint       │
 ├────────────────────────┼─────────────────────────────┼─────────────────────────────────┤
 │ 1. Real-Time Payments  │ • Sub-50ms Intent Firewall  │ services/iso20022_service.py    │
 │                        │ • ISO 20022 pacs.008 Wire   │ services/crypto/merkle_zk.py    │
@@ -107,7 +107,7 @@ VERA was architected to address **all five problem statements** set forth in Cha
 ### Deep Dive 1: Real-Time Payments (UPI 2.0, ISO 20022, ZK Intent)
 
 * **Challenge:** High-velocity payment rails settle in seconds; traditional fraud rules run asynchronously hours after money has left the banking perimeter.
-* **VERA Implementation:**
+* **VYOM Implementation:**
   1. **ISO 20022 Financial Wire Inspector:**
      - Ingests and generates standard `pacs.008.001.08` XML wire messages.
      - Inspects `GrpHdr`, `DbtrAgt`, `CdtrAgt`, and Remittance Information (`RmtInf`).
@@ -126,7 +126,7 @@ VERA was architected to address **all five problem statements** set forth in Cha
 ### Deep Dive 2: Real Asset Tokenization (TReDS Trade Receivables & Citi Liquidity)
 
 * **Challenge:** Indian MSMEs face working capital stagnation due to delayed corporate buyer payments. The Trade Receivables Electronic Discounting System (TReDS) requires immutable provenance to prevent duplicate invoice financing.
-* **VERA Implementation:**
+* **VYOM Implementation:**
   1. **Drunix Chaincode Asset Tokenization:**
      - Smart contract function `fn_CreateTokenizedAsset` and `fn_TransferAsset` deployed on Drunix ledger.
      - Ingests corporate invoice metadata (Buyer, Seller, Face Value, Maturity Date, Credit Rating).
@@ -143,7 +143,7 @@ VERA was architected to address **all five problem statements** set forth in Cha
 ### Deep Dive 3: Cross-Border Remittances (BIS Project Nexus & Citi Multi-Currency Corridors)
 
 * **Challenge:** Inward remittances to India ($125B+) face correspondent banking delays (2-5 days), opaque fees, and complex manual Reserve Bank of India Liberalised Remittance Scheme (LRS) compliance.
-* **VERA Implementation:**
+* **VYOM Implementation:**
   1. **BIS Project Nexus Multi-Lateral Gateway:**
      - Integrates India's UPI / e-Rupee rail with Singapore (PayNow), UAE (Jaywan/AANI), and Thailand (PromptPay).
      - Atomic cross-border clearing achieved in sub-2 seconds over Drunix inter-ledger connectors.
@@ -160,7 +160,7 @@ VERA was architected to address **all five problem statements** set forth in Cha
 ### Deep Dive 4: Financial Inclusion (Programmable CBDC e-Rupee Vouchers)
 
 * **Challenge:** Direct Benefit Transfer (DBT) subsidies worth ₹3.5 Lakh Crore annually suffer from intermediary leakages and diversion (e.g., agricultural subsidies spent on unauthorized commodities).
-* **VERA Implementation:**
+* **VYOM Implementation:**
   1. **Purpose-Bound Drunix Smart Vouchers:**
      - Smart contract functions `fn_MintCBDCToken` and `fn_RedeemCBDCToken`.
      - Direct issuance of programmable digital rupee (e-INR) vouchers to beneficiary mobile devices without requiring conventional bank accounts.
@@ -175,7 +175,7 @@ VERA was architected to address **all five problem statements** set forth in Cha
 ### Deep Dive 5: Innovative Fintech Ideas (Digital Arrest Coercion, 2-of-3 Quorum, Byzantine Chaos)
 
 * **Challenge:** Criminal syndicates extort crores from senior citizens and corporate treasuries using psychological coercion ("Digital Arrest"), where credentials are valid but consent is completely compromised.
-* **VERA Implementation:**
+* **VYOM Implementation:**
   1. **Telecom & Coercion Forensics Engine:**
      - Intercepts active VoIP call duration (WhatsApp/Skype > 15 minutes concurrent with banking session).
      - Detects remote desktop software active in background (AnyDesk, TeamViewer, RustDesk).
@@ -205,7 +205,7 @@ VERA was architected to address **all five problem statements** set forth in Cha
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
-│                        VERA x DRUNIX ENTERPRISE TOPOLOGY                               │
+│                        VYOM x DRUNIX ENTERPRISE TOPOLOGY                               │
 ├────────────────────────────────────────────────────────────────────────────────────────┤
 │                                                                                        │
 │   [ CITIZEN / MSME APPS ]        [ CITI WHOLESALE CLIENTS ]    [ RETAIL UPI / PSP ]    │
@@ -213,7 +213,7 @@ VERA was architected to address **all five problem statements** set forth in Cha
 │            └──────────────────────────┬───────┴─────────────────────────┘              │
 │                                       ▼                                                │
 │                      ┌─────────────────────────────────┐                               │
-│                      │   VERA INTENT FIREWALL (IGPS)   │                               │
+│                      │   VYOM INTENT FIREWALL (IGPS)   │                               │
 │                      │   • Intent Vector NLP (Sub-50ms)│                               │
 │                      │   • Coercion & RAT Forensics    │                               │
 │                      │   • Merkle Inclusion Trees      │                               │
@@ -258,7 +258,7 @@ VERA was architected to address **all five problem statements** set forth in Cha
 
 ## 4. Verification & Testing Matrix
 
-VERA includes a comprehensive automated test suite validating all advanced fintech features, cryptography, and Drunix chaincode state transitions:
+VYOM includes a comprehensive automated test suite validating all advanced fintech features, cryptography, and Drunix chaincode state transitions:
 
 ```bash
 $ python -m pytest tests/ -v
@@ -292,7 +292,7 @@ $ python -m pytest tests/ -v
 
 ## 5. Live Demonstration Guide for Judges
 
-The VERA workstation runs locally on `http://127.0.0.1:8000` with **zero Node.js dependencies** (pure semantic HTML5, CSS Grid, and vanilla ES modules).
+The VYOM workstation runs locally on `http://127.0.0.1:8000` with **zero Node.js dependencies** (pure semantic HTML5, CSS Grid, and vanilla ES modules).
 
 ### Step-by-Step Evaluation Walkthrough:
 

@@ -18,7 +18,7 @@ export async function renderResearch(container) {
       <div style="max-width: 860px; display:flex; flex-direction:column; gap:16px;">
         <div style="border-bottom:1px solid var(--border); padding-bottom:8px;">
           <div class="uppercase-label">SCIENTIFIC BENCHMARKS</div>
-          <h1 class="text-h1 mono" style="margin-top:2px;">VERA Empirical Experiments</h1>
+          <h1 class="text-h1 mono" style="margin-top:2px;">VYOM Empirical Experiments</h1>
         </div>
 
         <!-- Experiment 14 Abstract Panel -->
@@ -43,7 +43,7 @@ export async function renderResearch(container) {
             </div>
             <div>
               <span class="text-meta">Dataset:</span>
-              <span style="margin-left:6px;">VERA-PINT (10,000 synthetic Indian payment vectors) | Seed: 42</span>
+              <span style="margin-left:6px;">VYOM-PINT (10,000 synthetic Indian payment vectors) | Seed: 42</span>
             </div>
           </div>
         </div>
@@ -66,7 +66,7 @@ export async function renderResearch(container) {
             </thead>
             <tbody>
               ${baselines.map(b => `
-                <tr class="${b.model_name.includes('VERA') ? 'row-selected' : ''}">
+                <tr class="${(b.model_name.includes('VYOM') || b.model_name.includes('VERA')) ? 'row-selected' : ''}">
                   <td class="strong">${b.model_name}</td>
                   <td class="tabular-nums">${b.auc_roc.toFixed(3)}</td>
                   <td class="tabular-nums">${b.precision.toFixed(3)}</td>

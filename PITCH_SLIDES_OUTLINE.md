@@ -1,4 +1,4 @@
-# VERA × DRUNIX — CHAMPIONSHIP PITCH SLIDES OUTLINE
+# VYOM × DRUNIX — CHAMPIONSHIP PITCH SLIDES OUTLINE
 
 ### Drunix Hackathon (In collaboration with Citi & India Blockchain Forum)
 **Challenge Code:** CHL-7007 | **Track:** Build the Future of Payments in India | **Prize:** ₹175,000
@@ -6,7 +6,7 @@
 ---
 
 ## Slide 1: Title Slide (The Brand & Vision)
-* **Visual Headline:** VERA × DRUNIX
+* **Visual Headline:** VYOM × DRUNIX
 * **Subtitle:** The Intent Firewall for Digital Payments
 * **Tagline:** Intent-Governed Payment State (IGPS) Architecture Powered by NPCI Drunix DLT
 * **Hackathon Challenge:** Challenge Code: CHL-7007 | India Blockchain Forum & Citi Track
@@ -50,7 +50,7 @@
 ## Slide 5: Problem Statement 2 — Real Asset Tokenization
 * **Headline:** Institutional TReDS Trade Receivables on Drunix (ERC-3643)
 * **The Opportunity:** ₹30 Lakh Crore trapped in unpaid MSME invoices.
-* **VERA × Citi Treasury Solution:**
+* **VYOM × Citi Treasury Solution:**
   * On-chain tokenization of corporate trade receivables from AAA buyers (e.g., Tata Motors, L&T).
   * Fractional tranches allow institutional liquidity providers (Citi Treasury, NBFCs) to fund MSMEs at competitive yields.
   * Drunix smart contract enforces an automated cashflow waterfall upon buyer maturity, eliminating double-pledging.

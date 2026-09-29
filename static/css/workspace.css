@@ -1,8 +1,8 @@
-/* Split Screen & Investigation Workspace */
+/* VYOM Red Noir - Split Screen & Investigation Workspace */
 
 .workspace-split {
   display: flex;
-  gap: 12px;
+  gap: 16px;
   align-items: flex-start;
   height: 100%;
 }
@@ -12,19 +12,33 @@
   min-width: 0;
 }
 
-/* Right-Side Investigation Drawer */
+/* Right-Side Investigation Drawer (Red Noir Glass) */
 .investigation-drawer {
-  width: 380px;
+  width: 440px;
   flex-shrink: 0;
-  background-color: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 14px;
+  background: rgba(10, 10, 14, 0.92);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius);
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
   font-family: var(--font-mono);
   font-size: 11px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8), 0 0 30px rgba(239, 35, 60, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.investigation-drawer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #ef233c, transparent);
 }
 
 .drawer-header {
@@ -32,23 +46,64 @@
   align-items: flex-start;
   justify-content: space-between;
   border-bottom: 1px solid var(--border);
+  padding-bottom: 12px;
+}
+
+.drawer-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--border);
   padding-bottom: 8px;
+  overflow-x: auto;
+}
+
+.drawer-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.drawer-tab:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.drawer-tab.active {
+  color: #ffffff;
+  background: rgba(239, 35, 60, 0.15);
+  border-color: rgba(239, 35, 60, 0.4);
+  box-shadow: 0 0 12px rgba(239, 35, 60, 0.2);
 }
 
 .drawer-section-title {
-  font-size: 9px;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   color: var(--text-dim);
-  margin-bottom: 6px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .drawer-keyvalue-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 3px 0;
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
 }
 
 .drawer-key {
@@ -56,96 +111,56 @@
 }
 
 .drawer-val {
-  color: var(--text);
+  color: #ffffff;
   font-weight: 600;
 }
 
-.intent-box {
-  background-color: var(--bg);
-  border: 1px solid var(--border);
+.drawer-box {
+  background-color: rgba(5, 5, 7, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: var(--radius-sm);
-  padding: 8px;
-  font-size: 11px;
-  color: var(--text);
+  padding: 10px;
+}
+
+/* Code & Pre dumps in drawer */
+.drawer-code-block {
+  background-color: #000000;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: #a5b4fc;
+  overflow-x: auto;
+  max-height: 220px;
   line-height: 1.4;
 }
 
-/* Horizontal Risk Decomposition Bars */
-.risk-breakdown-row {
+/* Red Noir Alert Strip in drawer */
+.drawer-threat-alert {
+  background: linear-gradient(135deg, rgba(239, 35, 60, 0.2) 0%, rgba(239, 35, 60, 0.05) 100%);
+  border: 1px solid rgba(239, 35, 60, 0.4);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  color: #ffffff;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  align-items: flex-start;
   gap: 8px;
-  margin-bottom: 5px;
+  box-shadow: 0 0 16px rgba(239, 35, 60, 0.15);
 }
 
-.risk-breakdown-label {
-  font-size: 11px;
-  color: var(--text-secondary);
-  width: 140px;
-  flex-shrink: 0;
-}
-
-.risk-breakdown-bar {
-  flex: 1;
-  height: 5px;
-  background-color: var(--surface-3);
-  border-radius: 1px;
+/* Risk Meters */
+.risk-meter-track {
+  width: 100%;
+  height: 6px;
+  background-color: rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
   overflow: hidden;
-}
-
-.risk-breakdown-fill {
-  height: 100%;
-}
-
-.risk-breakdown-num {
-  width: 35px;
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-  color: var(--text);
-}
-
-/* Drunix State Sequence */
-.drunix-stepper {
-  display: flex;
-  gap: 4px;
   margin-top: 4px;
 }
 
-.drunix-stepper-item {
-  flex: 1;
-  padding: 3px;
-  text-align: center;
-  font-size: 8px;
-  font-family: var(--font-mono);
-  background-color: var(--surface-2);
-  border: 1px solid var(--border);
-  color: var(--text-dim);
-  border-radius: 1px;
-}
-
-.drunix-stepper-item.done {
-  background-color: var(--blue-subtle);
-  border-color: #264375;
-  color: var(--text);
-  font-weight: 600;
-}
-
-/* Dedicated Investigation Layout */
-.investigation-grid {
-  display: grid;
-  grid-template-columns: 300px 1fr 320px;
-  gap: 12px;
-  height: calc(100vh - var(--topbar-h) - var(--statusbar-h) - 40px);
-}
-
-.investigation-pane {
-  background-color: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 12px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+.risk-meter-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }

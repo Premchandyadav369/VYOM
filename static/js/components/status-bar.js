@@ -1,6 +1,5 @@
 /**
- * Status Bar Component
- * Persistent tiny status strip matching Section 25 & 26.
+ * Status Bar Component - Red Noir Edition
  */
 
 import { state } from '../state.js';
@@ -9,40 +8,35 @@ export function renderStatusBar(container) {
   const lastPayment = state.payments && state.payments.length > 0 ? state.payments[0] : null;
   const lastEventText = lastPayment
     ? `${lastPayment.payment_id} → ${lastPayment.decision}`
-    : 'No recent events';
+    : 'Consensus Synchronized';
 
   const modeText = state.isLiveFeed ? 'LIVE STREAM' : 'SIMULATION';
 
   container.innerHTML = `
-    <div class="status-items">
-      <div class="status-item">
-        <span class="connection-dot"></span>
-        <span>PAYMENT API</span>
+    <div class="flex items-center gap-3">
+      <div class="flex items-center gap-1.5">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]"></span>
+        <span class="text-zinc-400 font-mono text-[10px]">INTENT FIREWALL</span>
       </div>
-      <span class="text-dim">|</span>
-      <div class="status-item">
-        <span class="connection-dot"></span>
-        <span>RISK ENGINE</span>
+      <span class="text-zinc-700">|</span>
+      <div class="flex items-center gap-1.5">
+        <span class="w-1.5 h-1.5 rounded-full bg-[#ef233c] shadow-[0_0_8px_#ef233c]"></span>
+        <span class="text-zinc-400 font-mono text-[10px]">DRUNIX RAFT (4 PEERS)</span>
       </div>
-      <span class="text-dim">|</span>
-      <div class="status-item">
-        <span class="connection-dot"></span>
-        <span>DRUNIX</span>
-      </div>
-      <span class="text-dim">|</span>
-      <div class="status-item">
-        <span class="connection-dot" style="background-color:${state.isLiveFeed ? 'var(--green)' : 'var(--amber)'};"></span>
-        <span>${modeText}</span>
+      <span class="text-zinc-700">|</span>
+      <div class="flex items-center gap-1.5">
+        <span class="w-1.5 h-1.5 rounded-full ${state.isLiveFeed ? 'bg-emerald-400' : 'bg-amber-400'}"></span>
+        <span class="text-zinc-400 font-mono text-[10px]">${modeText}</span>
       </div>
     </div>
 
-    <div style="display:flex; align-items:center; gap:12px;">
-      <div>
-        <span class="text-dim">Last event:</span>
-        <span style="color:var(--text); font-weight:600; margin-left:4px;">${lastEventText}</span>
+    <div class="flex items-center gap-3">
+      <div class="flex items-center gap-1.5">
+        <span class="text-zinc-500 text-[10px]">Telemetry:</span>
+        <span class="text-zinc-200 font-semibold text-[10px] font-mono">${lastEventText}</span>
       </div>
-      <span class="text-dim">|</span>
-      <div id="status-clock" class="tabular-nums" style="color:var(--text-muted);">
+      <span class="text-zinc-700">|</span>
+      <div id="status-clock" class="text-zinc-400 font-mono text-[10px]">
         ${new Date().toLocaleTimeString('en-IN', { hour12: false })} IST
       </div>
     </div>

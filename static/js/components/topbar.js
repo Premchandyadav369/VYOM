@@ -1,86 +1,115 @@
 /**
- * Topbar Component
- * Upgraded with 1-Click Demo Scenario Injector and Keyboard Shortcut Modal.
+ * Topbar Component - Red Noir Edition
+ * Styled with Glowing Shimmer, Rotating Border Demo CTA, and VYOM Identity.
  */
 
 import { state } from '../state.js';
 
 export function renderTopbar(container, onOpenSearch) {
   const titles = {
-    overview: 'Overview',
-    payments: 'Payments',
+    overview: 'Overview & Threat Matrix',
+    payments: 'Live Payment Stream',
     investigation: 'Investigations',
-    risk: 'Risk Scoring',
-    graph: 'Relationship Graph',
-    drunix: 'Drunix Explorer',
-    nodes: 'Consortium Topology',
+    risk: 'Intent & Risk Scoring',
+    graph: 'Relationship Graph & Time-Travel',
+    drunix: 'Drunix Ledger Explorer',
+    nodes: 'Consortium Topology (4 Peers)',
     transactions: 'Ledger Transactions',
-    chaos: 'Consensus Chaos',
-    rules: 'Policy Rules',
-    cbdc_nexus: 'CBDC & Project Nexus',
-    remittance: 'Remittance',
-    assets: 'Tokenized Assets',
-    simulation: 'Simulation Lab',
-    research: 'Research Baselines',
-    security: 'Threat Model',
-    audit: 'Audit Logs'
+    chaos: 'Consensus Chaos Sandbox',
+    rules: 'Policy Rules Engine',
+    cbdc_nexus: 'Programmable CBDC & Project Nexus',
+    remittance: 'Cross-Border Corridors',
+    assets: 'Tokenized Trade Receivables (TReDS)',
+    simulation: 'Digital Twin Simulation',
+    research: 'Research Baselines & SFE',
+    security: 'Threat Model & Zero-Trust',
+    audit: 'Tamper-Evident Audit Logs'
   };
 
   const currentTitle = titles[state.currentView] || 'Operations';
 
   container.innerHTML = `
-    <div class="topbar-left">
-      <span style="font-family:var(--font-mono); font-weight:700; color:var(--text);">VERA</span>
-      <span class="text-dim">/</span>
-      <span class="topbar-workspace-tag">${currentTitle}</span>
+    <div class="topbar-left flex items-center gap-3">
+      <div class="flex items-center gap-2 cursor-pointer" id="brand-logo-trigger">
+        <div class="w-4 h-4 bg-[#ef233c] rounded-xs rotate-45 shadow-[0_0_14px_#ef233c]"></div>
+        <span class="font-manrope font-extrabold tracking-tight text-white text-sm">VYOM</span>
+      </div>
+      <span class="text-zinc-600 font-mono">/</span>
+      <span class="topbar-workspace-tag text-xs font-mono text-zinc-300 font-semibold tracking-wide">${currentTitle}</span>
     </div>
 
-    <div class="topbar-right">
-      <!-- 1-Click Interactive Demo Scenario Launcher -->
+    <div class="topbar-right flex items-center gap-3">
+      <!-- 1-Click Interactive Demo Scenario Launcher (Signature Shiny CTA) -->
       <div style="position:relative; display:inline-block;">
-        <button class="btn btn-sm btn-primary" id="btn-demo-scenarios" style="padding:2px 8px; font-weight:600;">
-          ⚡ Quick Demo Scenario ▾
+        <button class="shiny-cta flex items-center gap-2 text-white font-manrope font-bold text-xs" id="btn-demo-scenarios">
+          <iconify-icon icon="lucide:zap" class="text-[#ef233c] w-3.5 h-3.5"></iconify-icon>
+          <span>⚡ Quick Demo Scenario ▾</span>
         </button>
-        <div id="demo-scenarios-menu" style="display:none; position:absolute; top:100%; right:0; margin-top:4px; width:260px; background:var(--surface); border:1px solid var(--border-strong); border-radius:var(--radius-sm); box-shadow:0 12px 24px rgba(0,0,0,0.6); z-index:100; padding:4px;">
-          <div class="text-meta" style="padding:4px 8px; font-weight:700; border-bottom:1px solid var(--border);">INJECT REAL-TIME SCENARIO</div>
-          <button class="btn-scenario-opt" data-scenario="DIGITAL_ARREST" style="display:block; width:100%; text-align:left; padding:6px 8px; background:transparent; border:none; color:var(--red); font-family:var(--font-mono); font-size:10.5px; cursor:pointer;">
-            🚨 Digital Arrest Scam (₹98,000)
-            <div class="text-meta" style="font-size:9px; color:var(--text-muted);">Coercion active, CBI seizure narrative</div>
+        <div id="demo-scenarios-menu" style="display:none; position:absolute; top:calc(100% + 8px); right:0; width:290px; background:rgba(10,10,14,0.98); backdrop-filter:blur(24px); border:1px solid rgba(239,35,60,0.3); border-radius:12px; box-shadow:0 16px 40px rgba(0,0,0,0.9), 0 0 25px rgba(239,35,60,0.15); z-index:100; padding:6px; animation:fade-in-up 0.2s ease;">
+          <div class="text-[9.5px] font-mono font-bold text-zinc-400 uppercase tracking-wider px-3 py-2 border-b border-white/5 flex items-center justify-between">
+            <span>INJECT REAL-TIME SCENARIO</span>
+            <span class="text-[#ef233c]">1-CLICK</span>
+          </div>
+          <button class="btn-scenario-opt group w-full text-left p-2.5 rounded-lg hover:bg-red-500/10 transition-colors border border-transparent hover:border-red-500/20" data-scenario="DIGITAL_ARREST">
+            <div class="text-xs font-mono font-bold text-red-400 flex items-center gap-1.5">
+              <span>🚨 Digital Arrest Scam (₹98,000)</span>
+            </div>
+            <div class="text-[9px] font-mono text-zinc-500 mt-0.5">Coercion active, CBI authority seizure narrative</div>
           </button>
-          <button class="btn-scenario-opt" data-scenario="MULE_SYNDICATE" style="display:block; width:100%; text-align:left; padding:6px 8px; background:transparent; border:none; color:var(--amber); font-family:var(--font-mono); font-size:10.5px; cursor:pointer;">
-            ⚠️ Mule Syndicate Structuring (₹3,50,000)
-            <div class="text-meta" style="font-size:9px; color:var(--text-muted);">High-value layering, Quorum required</div>
+          <button class="btn-scenario-opt group w-full text-left p-2.5 rounded-lg hover:bg-amber-500/10 transition-colors border border-transparent hover:border-amber-500/20" data-scenario="MULE_SYNDICATE">
+            <div class="text-xs font-mono font-bold text-amber-400 flex items-center gap-1.5">
+              <span>⚠️ Mule Syndicate Structuring (₹3,50,000)</span>
+            </div>
+            <div class="text-[9px] font-mono text-zinc-500 mt-0.5">High-value fan-out layering, Quorum required</div>
           </button>
-          <button class="btn-scenario-opt" data-scenario="STANDARD_GROCERY" style="display:block; width:100%; text-align:left; padding:6px 8px; background:transparent; border:none; color:var(--green); font-family:var(--font-mono); font-size:10.5px; cursor:pointer;">
-            ✓ Standard Grocery Purchase (₹1,850)
-            <div class="text-meta" style="font-size:9px; color:var(--text-muted);">Blinkit order, instant Drunix commit</div>
+          <button class="btn-scenario-opt group w-full text-left p-2.5 rounded-lg hover:bg-emerald-500/10 transition-colors border border-transparent hover:border-emerald-500/20" data-scenario="STANDARD_GROCERY">
+            <div class="text-xs font-mono font-bold text-emerald-400 flex items-center gap-1.5">
+              <span>✓ Standard Grocery Order (₹1,850)</span>
+            </div>
+            <div class="text-[9px] font-mono text-zinc-500 mt-0.5">Blinkit order, instant Drunix commit</div>
           </button>
-          <button class="btn-scenario-opt" data-scenario="CROSS_BORDER_NEXUS" style="display:block; width:100%; text-align:left; padding:6px 8px; background:transparent; border:none; color:var(--blue); font-family:var(--font-mono); font-size:10.5px; cursor:pointer;">
-            🌐 Project Nexus Cross-Border (₹65,000)
-            <div class="text-meta" style="font-size:9px; color:var(--text-muted);">India UPI ➔ Singapore PayNow clearing</div>
+          <button class="btn-scenario-opt group w-full text-left p-2.5 rounded-lg hover:bg-blue-500/10 transition-colors border border-transparent hover:border-blue-500/20" data-scenario="CROSS_BORDER_NEXUS">
+            <div class="text-xs font-mono font-bold text-blue-400 flex items-center gap-1.5">
+              <span>🌐 Project Nexus Remittance (₹65,000)</span>
+            </div>
+            <div class="text-[9px] font-mono text-zinc-500 mt-0.5">India UPI ➔ Singapore PayNow atomic clearing</div>
           </button>
         </div>
       </div>
 
-      <button class="btn btn-sm" id="btn-topbar-search" style="padding:2px 8px;">
-        <span>Search</span>
-        <span class="kbd-badge" style="font-size:9px; margin-left:4px;">Ctrl+K</span>
+      <!-- Search Trigger -->
+      <button class="btn btn-sm flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full hover:border-red-500/30 text-zinc-300" id="btn-topbar-search">
+        <iconify-icon icon="lucide:search" class="w-3.5 h-3.5 text-zinc-400"></iconify-icon>
+        <span class="text-xs font-mono">Search</span>
+        <span class="kbd-badge text-[9px] px-1.5 py-0.2">Ctrl+K</span>
       </button>
 
-      <button class="btn btn-sm" id="btn-shortcuts-help" style="padding:2px 6px;" title="Keyboard Shortcuts">
-        <span>?</span>
+      <!-- Keyboard Shortcuts Help -->
+      <button class="btn btn-sm px-2.5 py-1.5 bg-white/5 border border-white/10 rounded-full hover:border-white/20 text-zinc-400 hover:text-white" id="btn-shortcuts-help" title="Keyboard Shortcuts">
+        <iconify-icon icon="lucide:help-circle" class="w-3.5 h-3.5"></iconify-icon>
       </button>
 
-      <span style="display:flex; align-items:center; gap:4px; font-size:11px;">
-        <span class="connection-dot"></span>
-        <span style="color:var(--green); font-weight:600;">Consensus Online</span>
-      </span>
+      <!-- Drunix Consensus Pulse Badge -->
+      <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-red-950/40 border border-red-500/30 text-xs font-mono">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-[#ef233c]"></span>
+        </span>
+        <span class="text-[#ef233c] font-bold tracking-wider text-[10px]">CONSENSUS LIVE</span>
+      </div>
 
-      <span class="text-meta" style="color:var(--text-dim);">
-        Tier-3 SOC Lead
-      </span>
+      <!-- Challenge CHL-7007 Alliance Badge -->
+      <div class="hidden xl:flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] font-mono">
+        <span class="text-white font-bold">CHL-7007</span>
+        <span class="text-zinc-600">•</span>
+        <span class="text-red-400">Citi × NPCI Drunix</span>
+      </div>
     </div>
   `;
+
+  document.getElementById('brand-logo-trigger')?.addEventListener('click', () => {
+    state.setView('overview');
+  });
 
   document.getElementById('btn-topbar-search')?.addEventListener('click', onOpenSearch);
 
@@ -129,38 +158,44 @@ export function showShortcutsModal() {
   if (!modal) {
     modal = document.createElement('div');
     modal.id = 'shortcuts-modal-overlay';
-    modal.className = 'cmd-overlay';
+    modal.className = 'modal-overlay';
     modal.innerHTML = `
-      <div class="cmd-modal" style="width:480px; padding:16px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid var(--border); padding-bottom:8px;">
-          <div style="font-weight:700; color:var(--text); font-size:13px;">KEYBOARD SHORTCUTS</div>
+      <div class="modal-content" style="max-width:500px;">
+        <div class="modal-header">
+          <div class="modal-title flex items-center gap-2">
+            <iconify-icon icon="lucide:keyboard" class="text-[#ef233c]"></iconify-icon>
+            <span>VYOM Workstation Shortcuts</span>
+          </div>
           <button class="btn btn-sm" id="btn-close-shortcuts">✕</button>
         </div>
-        <div style="display:flex; flex-direction:column; gap:8px; font-family:var(--font-mono); font-size:11px;">
-          <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid var(--border);">
-            <span style="color:var(--text-secondary);">Open Command Search</span>
+        <div class="modal-body space-y-2.5 font-mono text-xs">
+          <div class="flex justify-between items-center py-1.5 border-b border-white/5">
+            <span class="text-zinc-400">Open Command Palette / Search</span>
             <span class="kbd-badge">Ctrl + K / ⌘K</span>
           </div>
-          <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid var(--border);">
-            <span style="color:var(--text-secondary);">Close Drawer / Modals</span>
+          <div class="flex justify-between items-center py-1.5 border-b border-white/5">
+            <span class="text-zinc-400">Close Drawer / Modals</span>
             <span class="kbd-badge">Esc</span>
           </div>
-          <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid var(--border);">
-            <span style="color:var(--text-secondary);">Quick Scenarios Menu</span>
+          <div class="flex justify-between items-center py-1.5 border-b border-white/5">
+            <span class="text-zinc-400">Trigger Quick Demo Scenarios</span>
             <span class="kbd-badge">S</span>
           </div>
-          <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid var(--border);">
-            <span style="color:var(--text-secondary);">Switch to Overview</span>
+          <div class="flex justify-between items-center py-1.5 border-b border-white/5">
+            <span class="text-zinc-400">Navigate to Overview</span>
             <span class="kbd-badge">G then O</span>
           </div>
-          <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid var(--border);">
-            <span style="color:var(--text-secondary);">Switch to Payments</span>
+          <div class="flex justify-between items-center py-1.5 border-b border-white/5">
+            <span class="text-zinc-400">Navigate to Payments Stream</span>
             <span class="kbd-badge">G then P</span>
           </div>
-          <div style="display:flex; justify-content:space-between; padding:4px 0;">
-            <span style="color:var(--text-secondary);">Show Shortcuts Help</span>
+          <div class="flex justify-between items-center py-1.5">
+            <span class="text-zinc-400">Show This Shortcuts Modal</span>
             <span class="kbd-badge">?</span>
           </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-sm btn-primary" id="btn-modal-ok">Dismiss</button>
         </div>
       </div>
     `;
@@ -170,6 +205,9 @@ export function showShortcutsModal() {
       if (e.target === modal) modal.style.display = 'none';
     });
     document.getElementById('btn-close-shortcuts').onclick = () => {
+      modal.style.display = 'none';
+    };
+    document.getElementById('btn-modal-ok').onclick = () => {
       modal.style.display = 'none';
     };
   }

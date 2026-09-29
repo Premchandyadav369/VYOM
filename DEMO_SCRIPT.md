@@ -1,4 +1,4 @@
-# VERA × DRUNIX — 3-MINUTE WINNING DEMO SCRIPT
+# VYOM × DRUNIX — 3-MINUTE WINNING DEMO SCRIPT
 
 ### Drunix Hackathon (In collaboration with Citi & India Blockchain Forum)
 **Challenge Code:** CHL-7007 | **Track:** Build the Future of Payments in India | **Prize:** ₹175,000
@@ -29,7 +29,7 @@
 > 
 > *If an MPIN is entered, the money is gone forever. Criminal syndicates know this. That is why over **85% of catastrophic fraud in India today is Authorized Push Payment fraud**—specifically **Digital Arrest scams**, where senior citizens and corporate treasurers are psychologically coerced into transferring their life savings.*
 > 
-> *Today, we introduce **VERA**—the Intent Firewall for Digital Payments, powered by the **NPCI Drunix Distributed Ledger**."*
+> *Today, we introduce **VYOM**—the Intent Firewall for Digital Payments, powered by the **NPCI Drunix Distributed Ledger**."*
 
 ---
 
@@ -43,7 +43,7 @@
 **Presenter:**
 > *"Watch our live workstation. A user is being extorted on a video call by scammers impersonating customs officials. The victim enters their genuine MPIN.*
 > 
-> *Instead of an instant debit, VERA intercepts the payment in sub-50 milliseconds. Notice the verdict: **HOLD**. Drunix consensus has locked the transaction on-chain.*
+> *Instead of an instant debit, VYOM intercepts the payment in sub-50 milliseconds. Notice the verdict: **HOLD**. Drunix consensus has locked the transaction on-chain.*
 > 
 > *(Presenter clicks the payment row to open the Forensic Drawer)*
 > 
@@ -91,12 +91,12 @@
 
 **Presenter (Looking directly at Citi and NPCI mentors):**
 > *"To summarize:*
-> * For **NPCI**, VERA provides the missing Intent Firewall to eliminate Authorized Push Payment scams and scales the Drunix consortium ledger to 8,400+ TPS.*
-> * For **Citi**, VERA delivers institutional cross-border liquidity over Project Nexus, opens a massive TReDS tokenized asset class, and provides zero-trust compliance.*
+> * For **NPCI**, VYOM provides the missing Intent Firewall to eliminate Authorized Push Payment scams and scales the Drunix consortium ledger to 8,400+ TPS.*
+> * For **Citi**, VYOM delivers institutional cross-border liquidity over Project Nexus, opens a massive TReDS tokenized asset class, and provides zero-trust compliance.*
 > 
 > *All 5 problem statements. 19 out of 19 automated tests passing. Zero external framework bloat. Ready for production deployment.*
 > 
-> *We are VERA × DRUNIX. Thank you, and we welcome your questions."*
+> *We are VYOM × DRUNIX. Thank you, and we welcome your questions."*
 
 ---
 
@@ -104,7 +104,7 @@
 
 | Potential Judge Question | Crisp Winning Answer |
 |---|---|
-| **"How does VERA verify intent in under 50ms without adding payment latency?"** | *"We run an asymmetric pipeline: local cosine similarity on cached recipient embeddings and telecom heuristics execute in 18ms at the edge gateway. Heavy cryptographic proofs (Groth16 and Merkle inclusion) are generated asynchronously while the Drunix orderer batches the transaction into block proposals."* |
+| **"How does VYOM verify intent in under 50ms without adding payment latency?"** | *"We run an asymmetric pipeline: local cosine similarity on cached recipient embeddings and telecom heuristics execute in 18ms at the edge gateway. Heavy cryptographic proofs (Groth16 and Merkle inclusion) are generated asynchronously while the Drunix orderer batches the transaction into block proposals."* |
 | **"How does the 2-of-3 Quorum multi-sig prevent deadlock?"** | *"If a payment is placed on HOLD, the 2-of-3 multi-sig requires any two of Sending Bank, NPCI Switch, or Compliance to sign. If consensus is not reached within 4 hours, the smart contract automatically rolls back the escrowed balance to the sender's account."* |
 | **"Can scammers bypass the Digital Arrest detection by telling victims to disconnect WhatsApp?"** | *"If they disconnect, our Behavioral Isolation Forest triggers on the sudden network state change, rapid transaction velocity, and first-time high-value beneficiary trust score, maintaining the HOLD verdict."* |
 | **"How do you handle privacy when sharing data across Drunix consortium banks?"** | *"Drunix utilizes private data collections. Only cryptographic transaction hashes, Merkle roots, and Groth16 ZK intent predicates are shared on the shared ledger; sensitive PII remains strictly within the originating bank's enclave."* |

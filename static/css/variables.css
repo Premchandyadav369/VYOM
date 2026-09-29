@@ -1,47 +1,57 @@
-/* VERA Design System Tokens */
+/* VYOM Red Noir Design System Tokens */
 :root {
-  /* Canvas & Surfaces */
-  --bg: #0b0d10;
-  --surface: #101318;
-  --surface-2: #14181d;
-  --surface-3: #181d23;
-  --surface-hover: #1c2229;
+  /* Canvas & Noir Surfaces */
+  --bg: #000000;
+  --bg-noir: #050507;
+  --surface: #090a0e;
+  --surface-2: #0f1117;
+  --surface-3: #151821;
+  --surface-hover: #1c202c;
 
-  /* Borders - thin, low-contrast, non-glowing */
-  --border: #20252c;
-  --border-subtle: #171b21;
-  --border-strong: #2c333d;
+  /* Red Noir Accents */
+  --accent-red: #ef233c;
+  --accent-red-glow: rgba(239, 35, 60, 0.5);
+  --accent-red-subtle: rgba(239, 35, 60, 0.12);
+  --accent-red-border: rgba(239, 35, 60, 0.35);
+
+  /* Borders - Red Noir Glass */
+  --border: rgba(255, 255, 255, 0.08);
+  --border-subtle: rgba(255, 255, 255, 0.04);
+  --border-strong: rgba(255, 255, 255, 0.16);
+  --border-glow: rgba(239, 35, 60, 0.45);
 
   /* Typography */
-  --text: #f3f5f7;
-  --text-secondary: #c0c6cf;
-  --text-muted: #8b929c;
-  --text-dim: #545b66;
+  --text: #ffffff;
+  --text-secondary: #e2e8f0;
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
 
   /* Strict State Colors */
-  --blue: #4c8dff;
-  --blue-subtle: #1a2a47;
-  --green: #35c46a;
-  --green-bg: #0d2818;
-  --green-border: #1a4d2e;
-  --amber: #e5a83b;
-  --amber-bg: #2d1f08;
-  --amber-border: #593e10;
-  --red: #e05b62;
-  --red-bg: #2d0e11;
-  --red-border: #591d22;
+  --blue: #3b82f6;
+  --blue-subtle: rgba(59, 130, 246, 0.15);
+  --green: #10b981;
+  --green-bg: rgba(16, 185, 129, 0.12);
+  --green-border: rgba(16, 185, 129, 0.35);
+  --amber: #f59e0b;
+  --amber-bg: rgba(245, 158, 11, 0.12);
+  --amber-border: rgba(245, 158, 11, 0.35);
+  --red: #ef233c;
+  --red-bg: rgba(239, 35, 60, 0.15);
+  --red-border: rgba(239, 35, 60, 0.45);
 
   /* Geometry */
-  --radius-sm: 2px;
-  --radius: 4px;
-  --radius-md: 6px;
+  --radius-sm: 4px;
+  --radius: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
 
   /* Fonts */
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", "Helvetica Neue", sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  --font-manrope: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
   /* Layout */
-  --sidebar-w: 220px;
-  --topbar-h: 42px;
-  --statusbar-h: 24px;
+  --sidebar-w: 240px;
+  --topbar-h: 52px;
+  --statusbar-h: 28px;
 }
