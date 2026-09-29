@@ -37,18 +37,19 @@ export const DrunixExplorer: React.FC<DrunixExplorerProps> = ({ navigate }) => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between border-b border-[#181c28] pb-3">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="text-xl font-bold tracking-tight text-white">NPCI Drunix DLT Explorer</h2>
-            <span className="px-2 py-0.5 rounded bg-[#1e3a8a] text-[#93c5fd] font-mono text-[10px] font-bold">
-              {network?.mode === 'REAL' ? 'LIVE FABRIC NETWORK' : 'HIGH-FIDELITY SIMULATOR'}
+            <h2 className="text-lg font-bold tracking-tight text-white font-mono">Drunix Distributed Ledger Explorer</h2>
+            <span className="px-2 py-0.5 rounded bg-[#101928] border border-[#1e345e] text-[#38bdf8] font-mono text-[10px] font-bold">
+              {network?.mode === 'REAL' ? 'PRODUCTION NETWORK' : 'CONSORTIUM SIMULATOR'}
             </span>
           </div>
-          <p className="text-xs text-[#9ca3af] mt-0.5">
-            Distributed permissioned ledger with decoupled Lite Peers, Stateless Validation Service (VSCC), and SQL StateDB.
+          <p className="text-xs text-[#8b949e] mt-1 font-mono">
+            Permissioned settlement ledger with peer endorsement, stateless validation, and relational StateDB.
           </p>
         </div>
+
         <button
           onClick={fetchData}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-[#161922] border border-[#242b3d] text-xs text-[#9ca3af] hover:text-white"

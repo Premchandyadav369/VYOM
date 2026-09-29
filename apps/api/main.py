@@ -13,6 +13,8 @@ from datetime import datetime
 from typing import Dict, Any, List, Optional
 from fastapi import FastAPI, HTTPException, Depends, Query, Header, Request, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from sqlalchemy import func
 from sqlalchemy.orm import Session
@@ -56,6 +58,25 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Serve pure HTML/CSS/JS frontend without Node.js dependency
+_static_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../static"))
+if os.path.exists(_static_dir):
+    _css_dir = os.path.join(_static_dir, "css")
+    _js_dir = os.path.join(_static_dir, "js")
+    if os.path.exists(_css_dir):
+        app.mount("/css", StaticFiles(directory=_css_dir), name="css")
+    if os.path.exists(_js_dir):
+        app.mount("/js", StaticFiles(directory=_js_dir), name="js")
+    app.mount("/static", StaticFiles(directory=_static_dir), name="static")
+
+
+@app.get("/", include_in_schema=False)
+def serve_index():
+    index_path = os.path.join(_static_dir, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
+    return {"status": "ONLINE", "service": "VERA x DRUNIX Core API"}
 
 # Initialize singletons
 intent_engine = IntentEngine()
