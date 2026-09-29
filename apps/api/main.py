@@ -223,6 +223,38 @@ def create_payment(
         ]
     )
     db.add(db_payment)
+
+    # Persist Drunix block & transaction to SQLite for consistency
+    existing_block = db.query(DBDrunixBlock).filter(DBDrunixBlock.block_number == b_dec.block_number).first()
+    if not existing_block:
+        db.add(DBDrunixBlock(
+            block_number=b_dec.block_number,
+            current_block_hash=b_dec.current_block_hash,
+            previous_block_hash=b_dec.previous_block_hash,
+            channel_id=b_dec.channel_id,
+            tx_count=b_dec.tx_count,
+            merkle_root=b_dec.merkle_root,
+            orderer_identity=b_dec.orderer_identity,
+            timestamp=datetime.utcnow()
+        ))
+    db.add(DBDrunixTransaction(
+        tx_id=tx_dec.tx_id,
+        block_number=b_dec.block_number,
+        channel_id=tx_dec.channel_id,
+        chaincode_name=tx_dec.chaincode_name,
+        function_name=tx_dec.function_name,
+        args=tx_dec.args,
+        initiator_msp=tx_dec.initiator_msp,
+        proposal_hash=tx_dec.proposal_hash,
+        rw_set=tx_dec.rw_set,
+        endorsements=tx_dec.endorsements,
+        stateless_validation_status=tx_dec.stateless_validation_status,
+        mvcc_validation_status=tx_dec.mvcc_validation_status,
+        commit_status=tx_dec.commit_status,
+        transient_keydb_hash=tx_dec.transient_keydb_hash,
+        drunix_mode=drunix_adapter.mode,
+        created_at=datetime.utcnow()
+    ))
     db.commit()
 
     security_service.log_audit_event(
@@ -625,20 +657,54 @@ def list_assets(db: Session = Depends(get_db)):
 # ------------------------------------------------------------------------------
 
 @app.get("/drunix/network", tags=["Drunix Explorer"])
-def get_drunix_network():
+def get_drunix_network(db: Session = Depends(get_db)):
     """Returns live Drunix network topology, MSPs, Lite Peers, and block height."""
-    return drunix_adapter.get_network_health()
+    health = drunix_adapter.get_network_health()
+    max_block = db.query(func.max(DBDrunixBlock.block_number)).scalar()
+    tx_count = db.query(DBDrunixTransaction).count()
+    if max_block is not None:
+        health["block_height"] = max_block
+    if tx_count > 0:
+        health["total_transactions"] = tx_count
+    return health
 
 
 @app.get("/drunix/blocks", tags=["Drunix Explorer"])
-def get_drunix_blocks(limit: int = 15):
-    """Returns recent blocks on the Drunix ledger."""
+def get_drunix_blocks(limit: int = 15, db: Session = Depends(get_db)):
+    """Returns recent blocks on the Drunix ledger from persistent database and memory."""
+    db_blocks = db.query(DBDrunixBlock).order_by(DBDrunixBlock.block_number.desc()).limit(limit).all()
+    if db_blocks:
+        return [
+            {
+                "block_number": b.block_number,
+                "current_block_hash": b.current_block_hash,
+                "previous_block_hash": b.previous_block_hash,
+                "channel_id": b.channel_id,
+                "tx_count": b.tx_count,
+                "merkle_root": b.merkle_root,
+                "orderer_identity": b.orderer_identity,
+                "timestamp": b.timestamp.isoformat() if b.timestamp else datetime.utcnow().isoformat()
+            }
+            for b in db_blocks
+        ]
     return drunix_adapter.get_recent_blocks(limit)
 
 
 @app.get("/drunix/block/{block_number}", tags=["Drunix Explorer"])
-def get_drunix_block(block_number: int):
+def get_drunix_block(block_number: int, db: Session = Depends(get_db)):
     """Returns details for a specific block height."""
+    db_b = db.query(DBDrunixBlock).filter(DBDrunixBlock.block_number == block_number).first()
+    if db_b:
+        return {
+            "block_number": db_b.block_number,
+            "current_block_hash": db_b.current_block_hash,
+            "previous_block_hash": db_b.previous_block_hash,
+            "channel_id": db_b.channel_id,
+            "tx_count": db_b.tx_count,
+            "merkle_root": db_b.merkle_root,
+            "orderer_identity": db_b.orderer_identity,
+            "timestamp": db_b.timestamp.isoformat() if db_b.timestamp else datetime.utcnow().isoformat()
+        }
     b = drunix_adapter.get_block(block_number)
     if not b:
         raise HTTPException(status_code=404, detail="Block not found")
@@ -646,18 +712,68 @@ def get_drunix_block(block_number: int):
 
 
 @app.get("/drunix/transactions", tags=["Drunix Explorer"])
-def get_drunix_transactions(limit: int = 20):
-    """Returns recent transactions on the ledger."""
+def get_drunix_transactions(limit: int = 20, db: Session = Depends(get_db)):
+    """Returns recent transactions on the ledger from persistent database and memory."""
+    db_txs = db.query(DBDrunixTransaction).order_by(DBDrunixTransaction.created_at.desc()).limit(limit).all()
+    if db_txs:
+        return [
+            {
+                "tx_id": t.tx_id,
+                "block_number": t.block_number,
+                "channel_id": t.channel_id,
+                "chaincode_name": t.chaincode_name,
+                "function_name": t.function_name,
+                "args": t.args,
+                "initiator_msp": t.initiator_msp,
+                "proposal_hash": t.proposal_hash,
+                "rw_set": t.rw_set,
+                "endorsements": t.endorsements,
+                "stateless_validation_status": t.stateless_validation_status,
+                "mvcc_validation_status": t.mvcc_validation_status,
+                "commit_status": t.commit_status,
+                "drunix_mode": t.drunix_mode,
+                "created_at": t.created_at.isoformat() if t.created_at else datetime.utcnow().isoformat()
+            }
+            for t in db_txs
+        ]
     return drunix_adapter.get_recent_transactions(limit)
 
 
 @app.get("/drunix/transaction/{tx_id}", tags=["Drunix Explorer"])
-def get_drunix_transaction(tx_id: str):
+def get_drunix_transaction(tx_id: str, db: Session = Depends(get_db)):
     """Returns transaction details including RW set, endorsements, and validation status."""
+    db_tx = db.query(DBDrunixTransaction).filter(DBDrunixTransaction.tx_id == tx_id).first()
+    if db_tx:
+        return {
+            "tx_id": db_tx.tx_id,
+            "block_number": db_tx.block_number,
+            "channel_id": db_tx.channel_id,
+            "chaincode_name": db_tx.chaincode_name,
+            "function_name": db_tx.function_name,
+            "args": db_tx.args,
+            "initiator_msp": db_tx.initiator_msp,
+            "proposal_hash": db_tx.proposal_hash,
+            "rw_set": db_tx.rw_set,
+            "endorsements": db_tx.endorsements,
+            "stateless_validation_status": db_tx.stateless_validation_status,
+            "mvcc_validation_status": db_tx.mvcc_validation_status,
+            "commit_status": db_tx.commit_status,
+            "drunix_mode": db_tx.drunix_mode,
+            "created_at": db_tx.created_at.isoformat() if db_tx.created_at else datetime.utcnow().isoformat()
+        }
     tx = drunix_adapter.get_transaction(tx_id)
     if not tx:
         raise HTTPException(status_code=404, detail="Transaction not found")
     return tx
+
+
+@app.post("/system/reset-demo", tags=["System"])
+def reset_demo_database(db: Session = Depends(get_db)):
+    """Resets and re-seeds database with fresh benchmark scenario data."""
+    from scripts.seed_demo import seed_demo_data
+    seed_demo_data()
+    return {"status": "SUCCESS", "message": "Database reset and seeded with fresh benchmark scenarios"}
+
 
 
 # ------------------------------------------------------------------------------
