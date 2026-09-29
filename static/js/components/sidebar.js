@@ -21,6 +21,7 @@ export function renderSidebar(container) {
       title: 'INFRASTRUCTURE',
       items: [
         { id: 'drunix', label: 'Drunix' },
+        { id: 'chaos', label: 'Consensus Chaos' },
         { id: 'transactions', label: 'Transactions' },
         { id: 'rules', label: 'Policy Rules' }
       ]
@@ -28,6 +29,7 @@ export function renderSidebar(container) {
     {
       title: 'FINANCE',
       items: [
+        { id: 'cbdc_nexus', label: 'CBDC & Nexus' },
         { id: 'remittance', label: 'Remittance' },
         { id: 'assets', label: 'Assets' }
       ]

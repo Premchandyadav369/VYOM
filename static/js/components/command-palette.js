@@ -79,6 +79,8 @@ function updateResults(query) {
     { type: 'View', title: 'Risk', desc: 'Risk scoring & model weights', id: 'risk' },
     { type: 'View', title: 'Graph', desc: 'Counterparty relationship network', id: 'graph' },
     { type: 'View', title: 'Drunix', desc: 'Blockchain ledger explorer', id: 'drunix' },
+    { type: 'View', title: 'CBDC & Nexus', desc: 'Programmable e-Rupee & Multilateral Clearing', id: 'cbdc_nexus' },
+    { type: 'View', title: 'Consensus Chaos', desc: 'Drunix Byzantine fault injection lab', id: 'chaos' },
     { type: 'View', title: 'Simulation', desc: 'Digital twin fraud testbed', id: 'simulation' },
     { type: 'View', title: 'Research', desc: 'Empirical benchmark experiments', id: 'research' },
     { type: 'View', title: 'Remittance', desc: 'Cross-border payment corridors', id: 'remittance' }

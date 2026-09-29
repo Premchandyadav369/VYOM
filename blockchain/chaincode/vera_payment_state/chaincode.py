@@ -58,9 +58,36 @@ class VeraPaymentStateChaincode:
         self.history: Dict[str, List[Dict[str, Any]]] = {}
 
     def get_state(self, key: str) -> Optional[Dict[str, Any]]:
-        """Reads a key from the Drunix SQL/world state."""
+        """Reads a key from the Drunix SQL/world state with persistent SQLite fallback."""
         record = self.world_state.get(key)
-        return record["value"] if record else None
+        if record:
+            return record["value"]
+        if key.startswith("PAYMENT_"):
+            pid = key.replace("PAYMENT_", "")
+            try:
+                from data.database import SessionLocal, DBPayment
+                db = SessionLocal()
+                p = db.query(DBPayment).filter(DBPayment.payment_id == pid).first()
+                if p:
+                    val = {
+                        "payment_id": p.payment_id,
+                        "sender_id": p.sender_id,
+                        "recipient_id": p.recipient_id,
+                        "amount": p.amount,
+                        "currency": p.currency,
+                        "status": p.status,
+                        "decision": p.decision,
+                        "risk_score": p.risk_score,
+                        "created_at": p.created_at.isoformat() if p.created_at else datetime.utcnow().isoformat(),
+                        "updated_at": p.updated_at.isoformat() if p.updated_at else datetime.utcnow().isoformat()
+                    }
+                    self.world_state[key] = {"value": val, "version": 1}
+                    db.close()
+                    return val
+                db.close()
+            except Exception:
+                pass
+        return None
 
     def put_state(self, key: str, value: Dict[str, Any], rw_set: Dict[str, Any]) -> int:
         """Stages a state update into the Read/Write set."""
@@ -319,6 +346,26 @@ class VeraPaymentStateChaincode:
 
         self.put_state(f"ASSET_{asset_id}", asset, rw_set)
         return {"status": "SUCCESS", "asset_id": asset_id, "new_owner": new_owner_id}
+
+    # --------------------------------------------------------------------------
+    # CBDC (e-Rupee) Programmable Token Functions
+    # --------------------------------------------------------------------------
+
+    def fn_MintCBDCToken(
+        self, args: Dict[str, Any], caller_msp: str, rw_set: Dict[str, Any], transient: Optional[Dict[str, Any]]
+    ) -> Dict[str, Any]:
+        """Mints a programmable e-Rupee token on Drunix consortium ledger."""
+        token_id = args.get("token_id")
+        token_data = {
+            "token_id": token_id,
+            "amount": float(args.get("amount", 0.0)),
+            "purpose": args.get("purpose"),
+            "status": "MINTED_ACTIVE",
+            "issuer_msp": caller_msp,
+            "minted_at": datetime.utcnow().isoformat()
+        }
+        self.put_state(f"CBDC_{token_id}", token_data, rw_set)
+        return {"status": "SUCCESS", "token_id": token_id, "state": "MINTED"}
 
     # --------------------------------------------------------------------------
     # Queries & State Invariants

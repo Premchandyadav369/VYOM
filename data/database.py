@@ -160,13 +160,82 @@ class DBExperimentRun(Base):
     intent_mismatch_recall = Column(Float)
     latency_ms = Column(Float)
     sfe_score = Column(Float)
-    metrics_json = Column(JSON, default=dict)
+
+class DBQuorumSignature(Base):
+    __tablename__ = "quorum_signatures"
+
+    signature_id = Column(String(64), primary_key=True)
+    payment_id = Column(String(64), index=True)
+    signer_role = Column(String(64))  # ROLE_BANK_RISK_LEAD, ROLE_NPCI_GATEWAY_AUDITOR, ROLE_COMPLIANCE_DIRECTOR
+    signer_id = Column(String(64))
+    signer_name = Column(String(128))
+    public_key = Column(String(128))
+    signature_hex = Column(String(256))
+    decision = Column(String(16), default="APPROVE")
+    comments = Column(Text, nullable=True)
+    timestamp = Column(DateTime, default=datetime.utcnow)
+
+
+class DBSARReport(Base):
+    __tablename__ = "sar_reports"
+
+    sar_id = Column(String(64), primary_key=True, index=True)
+    payment_id = Column(String(64), index=True)
+    reporting_entity = Column(String(128), default="NPCI-VERA Core Network Gateway")
+    fiu_reference_id = Column(String(64), unique=True)
+    suspect_id = Column(String(64))
+    recipient_id = Column(String(64))
+    amount_inr = Column(Float)
+    grounds_for_suspicion = Column(Text)
+    intent_mismatch_summary = Column(Text)
+    reason_codes = Column(JSON, default=list)
+    drunix_block_number = Column(Integer)
+    drunix_tx_id = Column(String(64))
+    digital_signature = Column(String(256))
+    filing_status = Column(String(32), default="SUBMITTED_TO_FIU_IND")
+    full_dossier = Column(JSON, default=dict)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class DBCBDCToken(Base):
+    __tablename__ = "cbdc_tokens"
+
+    token_id = Column(String(64), primary_key=True, index=True)
+    denomination_e_inr = Column(Float, nullable=False)
+    purpose_code = Column(String(64), index=True)  # e.g., AGRI_FERTILIZER, HEALTH_AYUSHMAN
+    allowed_mcc_list = Column(JSON, default=list)
+    beneficiary_id = Column(String(64), index=True)
+    issuing_authority = Column(String(64), default="RBI_CBDC_GATEWAY")
+    status = Column(String(32), default="ACTIVE")  # ACTIVE, REDEEMED, EXPIRED, REVOKED
+    expiry_date = Column(String(32))
+    redemption_tx_id = Column(String(64), nullable=True)
+    drunix_tx_id = Column(String(64))
+    drunix_block_number = Column(Integer)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class DBCoercionAudit(Base):
+    __tablename__ = "coercion_audits"
+
+    audit_id = Column(String(64), primary_key=True, index=True)
+    payment_id = Column(String(64), index=True)
+    active_call_duration_seconds = Column(Integer, default=0)
+    call_channel = Column(String(32), default="PSTN")  # WHATSAPP_VOIP, TELEGRAM, PSTN, SKYPE
+    remote_access_tool_detected = Column(Boolean, default=False)  # AnyDesk, TeamViewer
+    caller_geo_risk = Column(String(32), default="NORMAL")
+    keystroke_hesitation_ms = Column(Integer, default=0)
+    clipboard_paste_detected = Column(Boolean, default=False)
+    urgency_nlp_score = Column(Float, default=0.0)
+    coercion_risk_score = Column(Float, default=0.0)
+    coercion_level = Column(String(16), default="LOW")
+    flags = Column(JSON, default=list)
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
 def init_db():
     """Initializes tables in database."""
     Base.metadata.create_all(bind=engine)
+
 
 
 def get_db() -> Generator[Session, None, None]:

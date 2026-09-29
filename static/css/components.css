@@ -192,3 +192,120 @@
 .cmd-result-row:hover, .cmd-result-row.selected {
   background-color: var(--surface-3);
 }
+
+/* Tabs */
+.tabs-header {
+  display: flex;
+  gap: 2px;
+  background-color: var(--bg);
+  border-bottom: 1px solid var(--border);
+  padding: 0 4px;
+}
+
+.tab-btn {
+  padding: 6px 10px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.tab-btn:hover {
+  color: var(--text);
+}
+
+.tab-btn.active {
+  color: var(--blue);
+  border-bottom-color: var(--blue);
+}
+
+/* Code & Raw Wire Hex Blocks */
+.code-box {
+  background-color: #07090c;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1.45;
+  color: #c9d1d9;
+  overflow-x: auto;
+  white-space: pre;
+}
+
+.hex-dump {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: #79c0ff;
+  background-color: #05070a;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 6px 8px;
+  overflow-x: auto;
+  line-height: 1.35;
+}
+
+/* Real-Time Live Notification Toasts */
+.toast-container {
+  position: fixed;
+  bottom: 34px;
+  right: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 999;
+  pointer-events: none;
+}
+
+.toast-item {
+  pointer-events: auto;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  background-color: #12161d;
+  border: 1px solid var(--border-strong);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+  animation: slideIn 0.2s ease-out;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toast-item.alert-danger {
+  border-left: 3px solid var(--red);
+  background-color: #211215;
+}
+
+.toast-item.alert-info {
+  border-left: 3px solid var(--blue);
+}
+
+@keyframes slideIn {
+  from { transform: translateX(30px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* Time Travel Slider */
+.slider-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: var(--surface-2);
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+
+.time-slider {
+  flex: 1;
+  accent-color: var(--blue);
+  cursor: pointer;
+}
+
